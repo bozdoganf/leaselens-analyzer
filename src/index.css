@@ -3,131 +3,119 @@
 @tailwind utilities;
 
 /* LeaseLens Design System
-   Student-friendly SaaS - light theme, blue/white/gray palette
+   Corporate/Modern, Student-Focused warmth.
+   Manrope (display) + Inter (body). Light theme only.
    All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    /* Base surfaces */
-    --background: 210 40% 98%;
-    --foreground: 222 47% 11%;
+    /* Tiered surfaces */
+    --background: 240 100% 99%;          /* #f9f9ff page canvas */
+    --foreground: 216 45% 12%;           /* #111c2d on-surface */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%;                   /* pure white */
+    --card-foreground: 216 45% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 216 45% 12%;
 
-    /* Brand - trustworthy blue */
-    --primary: 217 91% 55%;
+    /* Surface containers */
+    --surface-low: 225 100% 97%;         /* #f0f3ff */
+    --surface: 224 100% 95%;             /* #e7eeff */
+    --surface-high: 224 100% 93%;        /* #dee8ff */
+    --surface-highest: 220 86% 92%;      /* #d8e3fb */
+
+    /* Brand — trustworthy blue */
+    --primary: 218 100% 39%;             /* #004ac6 */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 95% 68%;
-    --primary-soft: 217 100% 96%;
+    --primary-glow: 221 83% 53%;         /* #2563eb container */
+    --primary-soft: 230 100% 96%;        /* #eef0ff lifted */
 
-    --secondary: 215 25% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 225 100% 97%;           /* light surface */
+    --secondary-foreground: 216 45% 12%;
 
-    --muted: 215 25% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 224 100% 95%;
+    --muted-foreground: 230 11% 30%;     /* #434655 */
 
-    --accent: 217 100% 96%;
-    --accent-foreground: 217 91% 35%;
+    --accent: 230 100% 96%;
+    --accent-foreground: 218 100% 39%;
 
-    /* Risk semantic colors */
-    --safe: 142 71% 45%;
+    /* Semantic risk colors */
+    --safe: 142 71% 38%;
     --safe-foreground: 0 0% 100%;
-    --safe-soft: 142 70% 95%;
+    --safe-soft: 142 65% 93%;
 
     --caution: 38 92% 50%;
-    --caution-foreground: 0 0% 100%;
-    --caution-soft: 38 100% 95%;
+    --caution-foreground: 30 60% 18%;
+    --caution-soft: 45 100% 94%;
 
-    --danger: 0 84% 60%;
+    --danger: 0 75% 41%;                 /* #ba1a1a */
     --danger-foreground: 0 0% 100%;
-    --danger-soft: 0 90% 96%;
+    --danger-soft: 4 100% 94%;           /* #ffdad6 */
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 75% 41%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 215 20% 90%;
-    --input: 215 20% 90%;
-    --ring: 217 91% 55%;
+    /* Lines */
+    --border: 228 30% 88%;               /* slightly cooler #d8dde9 */
+    --input: 228 30% 88%;
+    --ring: 218 100% 39%;
 
-    --radius: 1rem;
+    --radius: 1rem;                      /* 16px - cards */
 
-    /* Gradients */
-    --gradient-hero: linear-gradient(135deg, hsl(217 100% 97%) 0%, hsl(210 40% 98%) 50%, hsl(217 95% 96%) 100%);
-    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 100%);
-    --gradient-score-safe: linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(160 71% 50%) 100%);
-    --gradient-score-caution: linear-gradient(135deg, hsl(38 92% 50%) 0%, hsl(28 95% 55%) 100%);
-    --gradient-score-danger: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(350 85% 55%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(217 100% 99%) 100%);
+    /* Soft, ambient elevation */
+    --shadow-soft: 0 1px 2px 0 hsl(220 30% 50% / 0.04);
+    --shadow-card: 0 4px 6px -1px hsl(220 30% 40% / 0.06), 0 2px 4px -2px hsl(220 30% 40% / 0.05);
+    --shadow-elevated: 0 10px 24px -8px hsl(220 40% 30% / 0.12), 0 4px 10px -4px hsl(220 30% 40% / 0.08);
+    --shadow-glow: 0 0 24px hsl(var(--primary) / 0.18);
 
-    /* Shadows */
-    --shadow-soft: 0 1px 3px 0 hsl(217 30% 60% / 0.08), 0 1px 2px -1px hsl(217 30% 60% / 0.06);
-    --shadow-card: 0 4px 16px -4px hsl(217 50% 50% / 0.08), 0 2px 6px -2px hsl(217 30% 50% / 0.05);
-    --shadow-elevated: 0 12px 32px -8px hsl(217 50% 40% / 0.15), 0 4px 12px -4px hsl(217 40% 40% / 0.08);
-    --shadow-glow: 0 0 40px hsl(217 91% 65% / 0.25);
+    /* Gradients (used sparingly) */
+    --gradient-hero: linear-gradient(180deg, hsl(240 100% 99%) 0%, hsl(225 100% 97%) 100%);
+    --gradient-primary: linear-gradient(135deg, hsl(218 100% 39%) 0%, hsl(221 83% 53%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(230 100% 99%) 100%);
 
-    /* Motion */
-    --transition-base: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-smooth: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar (app shell) */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 216 45% 12%;
+    --sidebar-primary: 218 100% 39%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 230 100% 96%;
+    --sidebar-accent-foreground: 218 100% 39%;
+    --sidebar-border: 228 30% 90%;
+    --sidebar-ring: 218 100% 39%;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+  * { @apply border-border; }
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', 'Inter', sans-serif;
     @apply tracking-tight;
   }
 }
 
 @layer utilities {
-  .bg-gradient-hero {
-    background: var(--gradient-hero);
-  }
-  .bg-gradient-primary {
-    background: var(--gradient-primary);
-  }
-  .bg-gradient-card {
-    background: var(--gradient-card);
-  }
-  .shadow-soft {
-    box-shadow: var(--shadow-soft);
-  }
-  .shadow-card {
-    box-shadow: var(--shadow-card);
-  }
-  .shadow-elevated {
-    box-shadow: var(--shadow-elevated);
-  }
-  .shadow-glow {
-    box-shadow: var(--shadow-glow);
-  }
-  .transition-base {
-    transition: var(--transition-base);
-  }
-  .transition-smooth {
-    transition: var(--transition-smooth);
-  }
+  .bg-gradient-hero { background: var(--gradient-hero); }
+  .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-card { background: var(--gradient-card); }
+  .shadow-soft { box-shadow: var(--shadow-soft); }
+  .shadow-card { box-shadow: var(--shadow-card); }
+  .shadow-elevated { box-shadow: var(--shadow-elevated); }
+  .shadow-glow { box-shadow: var(--shadow-glow); }
+  .transition-base { transition: var(--transition-base); }
+  .transition-smooth { transition: var(--transition-smooth); }
+  .font-display { font-family: 'Manrope', 'Inter', sans-serif; }
 }
 
 @layer components {
