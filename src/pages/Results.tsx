@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Header } from "@/components/Header";
+import { AppLayout } from "@/layouts/AppLayout";
 import { ScoreCard } from "@/components/ScoreCard";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
 import { RiskFlagCard } from "@/components/RiskFlagCard";
@@ -16,7 +16,7 @@ const Results = () => {
   const { result } = useAnalysis();
 
   useEffect(() => {
-    if (!result) navigate("/", { replace: true });
+    if (!result) navigate("/upload", { replace: true });
   }, [result, navigate]);
 
   if (!result) return null;
@@ -60,9 +60,15 @@ const Results = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-hero">
-      <Header />
-      <main className="container py-8 md:py-12 space-y-8">
+    <AppLayout>
+      <div className="mb-8">
+        <h1 className="font-display text-3xl font-extrabold text-foreground">Lease Analysis</h1>
+        <p className="text-muted-foreground mt-1">
+          Your full housing risk report. Review flags before signing.
+        </p>
+      </div>
+
+      <div className="space-y-8">
         <ScoreCard
           score={result.overallScore}
           riskLabel={result.riskLabel}
@@ -71,18 +77,18 @@ const Results = () => {
         />
 
         <section>
-          <h3 className="font-display text-xl font-extrabold text-foreground mb-4">
+          <h2 className="font-display text-xl font-extrabold text-foreground mb-4">
             Score breakdown
-          </h3>
+          </h2>
           <ScoreBreakdown breakdown={result.breakdown} />
         </section>
 
         <section>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-display text-xl font-extrabold text-foreground flex items-center gap-2">
+            <h2 className="font-display text-xl font-extrabold text-foreground flex items-center gap-2">
               <AlertTriangle className="h-5 w-5 text-caution" />
               Risky clauses found
-            </h3>
+            </h2>
             <span className="text-sm text-muted-foreground">
               {result.riskFlags.length} flag{result.riskFlags.length !== 1 ? "s" : ""}
             </span>
@@ -95,9 +101,9 @@ const Results = () => {
         </section>
 
         <section>
-          <h3 className="font-display text-xl font-extrabold text-foreground mb-4">
+          <h2 className="font-display text-xl font-extrabold text-foreground mb-4">
             Price & location insights
-          </h3>
+          </h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <InsightCard
               icon={DollarSign}
@@ -126,10 +132,10 @@ const Results = () => {
           <LandlordQuestionsChecklist questions={result.questions} />
         </section>
 
-        <section className="flex flex-col sm:flex-row gap-3 pt-4">
+        <section className="flex flex-col sm:flex-row gap-3 pt-2">
           <Button
             onClick={() => navigate("/compare")}
-            className="bg-gradient-primary hover:opacity-95 text-primary-foreground font-semibold h-12 px-6 shadow-card"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg h-11 px-5 shadow-soft"
           >
             <GitCompareArrows className="h-4 w-4 mr-2" />
             Compare Another Option
@@ -137,15 +143,15 @@ const Results = () => {
           <Button
             onClick={handleDownload}
             variant="outline"
-            className="font-semibold h-12 px-6 border-primary/30 text-primary hover:bg-primary-soft hover:text-primary"
+            className="font-semibold rounded-lg h-11 px-5 border-border bg-card hover:bg-secondary text-foreground"
           >
             <Download className="h-4 w-4 mr-2" />
             Download Summary
           </Button>
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/upload")}
             variant="ghost"
-            className="font-semibold h-12 px-6 text-muted-foreground hover:text-foreground"
+            className="font-semibold rounded-lg h-11 px-5 text-muted-foreground hover:text-foreground"
           >
             <RotateCcw className="h-4 w-4 mr-2" />
             Start New Analysis
@@ -155,8 +161,8 @@ const Results = () => {
         <p className="text-xs text-center text-muted-foreground pt-2">
           LeaseLens is an educational tool and does not provide legal advice.
         </p>
-      </main>
-    </div>
+      </div>
+    </AppLayout>
   );
 };
 
