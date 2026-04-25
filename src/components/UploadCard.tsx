@@ -1,8 +1,6 @@
 import { useRef, useState } from "react";
-import { Upload, FileText, FileImage } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { FileUp } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 interface UploadCardProps {
@@ -27,91 +25,73 @@ export const UploadCard = ({ leaseText, onLeaseTextChange, onSampleClick }: Uplo
 
   return (
     <div className="space-y-5">
-      <div>
-        <Label className="text-sm font-semibold text-foreground mb-2 block">
-          Upload lease, listing, or screenshot
-        </Label>
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setDragActive(true);
-          }}
-          onDragLeave={() => setDragActive(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setDragActive(false);
-            const file = e.dataTransfer.files?.[0];
+      <div
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragActive(true);
+        }}
+        onDragLeave={() => setDragActive(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragActive(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file) handleFile(file);
+        }}
+        onClick={() => inputRef.current?.click()}
+        className={cn(
+          "relative cursor-pointer rounded-xl border-2 border-dashed bg-secondary/50 p-10 text-center transition-base",
+          dragActive
+            ? "border-primary bg-primary-soft"
+            : "border-border hover:border-primary/40 hover:bg-primary-soft/40",
+        )}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept=".png,.jpg,.jpeg,.pdf,.txt,.docx"
+          className="hidden"
+          onChange={(e) => {
+            const file = e.target.files?.[0];
             if (file) handleFile(file);
           }}
-          className={cn(
-            "relative rounded-2xl border-2 border-dashed bg-gradient-to-b from-primary-soft/50 to-background p-8 text-center transition-base",
-            dragActive
-              ? "border-primary bg-primary-soft scale-[1.01]"
-              : "border-border hover:border-primary/60 hover:bg-primary-soft/30",
-          )}
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept=".png,.jpg,.jpeg,.pdf,.txt"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFile(file);
-            }}
-          />
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-              {fileName ? <FileImage className="h-7 w-7" /> : <Upload className="h-7 w-7" />}
-            </div>
-            <div>
-              <p className="text-base font-semibold text-foreground">
-                {fileName ? fileName : "Drag & drop a file here"}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Supports PNG, JPG, PDF, or pasted text
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => inputRef.current?.click()}
-              className="font-semibold border-primary/30 text-primary hover:bg-primary-soft hover:text-primary"
-            >
-              Choose File
-            </Button>
+        />
+        <div className="flex flex-col items-center gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary-soft text-primary">
+            <FileUp className="h-5 w-5" />
           </div>
+          <p className="text-base text-foreground">
+            <span className="text-primary font-semibold">Choose File</span>{" "}
+            <span className="text-muted-foreground">or drag and drop</span>
+          </p>
+          {fileName && (
+            <p className="text-xs text-primary font-semibold">{fileName}</p>
+          )}
         </div>
       </div>
 
       <div className="relative flex items-center gap-3">
         <div className="h-px flex-1 bg-border" />
-        <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+        <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
           or paste lease text below
         </span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div>
-        <Label htmlFor="lease-text" className="text-sm font-semibold text-foreground mb-2 flex items-center gap-2">
-          <FileText className="h-4 w-4" />
-          Lease or listing text
-        </Label>
-        <Textarea
-          id="lease-text"
-          value={leaseText}
-          onChange={(e) => onLeaseTextChange(e.target.value)}
-          placeholder="Paste lease or rental listing text here..."
-          className="min-h-[160px] resize-y text-sm leading-relaxed bg-secondary/40 border-border focus:bg-background"
-        />
-        <button
-          type="button"
-          onClick={onSampleClick}
-          className="mt-2 text-xs font-semibold text-primary hover:text-primary-glow transition-base"
-        >
-          ✨ Try Sample Lease →
-        </button>
-      </div>
+      <Textarea
+        id="lease-text"
+        value={leaseText}
+        onChange={(e) => onLeaseTextChange(e.target.value)}
+        placeholder="Paste the full text of your lease agreement here..."
+        className="min-h-[180px] resize-y text-sm leading-relaxed bg-card border-border focus-visible:ring-1 focus-visible:ring-primary"
+      />
+
+      <button
+        type="button"
+        onClick={onSampleClick}
+        className="text-xs font-semibold text-primary hover:text-primary/80 transition-base"
+      >
+        ✨ Try Sample Lease →
+      </button>
     </div>
   );
 };
