@@ -5,8 +5,17 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AnalysisProvider } from "@/context/AnalysisContext";
 import Index from "./pages/Index.tsx";
+import Upload from "./pages/Upload.tsx";
+import Analyzing from "./pages/Analyzing.tsx";
+import Dashboard from "./pages/Dashboard.tsx";
 import Results from "./pages/Results.tsx";
 import Compare from "./pages/Compare.tsx";
+import MyLeases from "./pages/MyLeases.tsx";
+import MarketInsights from "./pages/MarketInsights.tsx";
+import Help from "./pages/Help.tsx";
+import SignIn from "./pages/SignIn.tsx";
+import Settings from "./pages/Settings.tsx";
+import Support from "./pages/Support.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -19,9 +28,22 @@ const App = () => (
       <BrowserRouter>
         <AnalysisProvider>
           <Routes>
+            {/* Marketing */}
             <Route path="/" element={<Index />} />
+            <Route path="/upload" element={<Upload />} />
+            <Route path="/my-leases" element={<MyLeases />} />
+            <Route path="/market-insights" element={<MarketInsights />} />
+            <Route path="/help" element={<Help />} />
+            <Route path="/sign-in" element={<SignIn />} />
+
+            {/* App */}
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/analyzing" element={<Analyzing />} />
             <Route path="/results" element={<Results />} />
             <Route path="/compare" element={<Compare />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/support" element={<Support />} />
+
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
