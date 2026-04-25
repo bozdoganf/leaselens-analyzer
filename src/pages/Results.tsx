@@ -1,0 +1,163 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Header } from "@/components/Header";
+import { ScoreCard } from "@/components/ScoreCard";
+import { ScoreBreakdown } from "@/components/ScoreBreakdown";
+import { RiskFlagCard } from "@/components/RiskFlagCard";
+import { InsightCard } from "@/components/InsightCard";
+import { LandlordQuestionsChecklist } from "@/components/LandlordQuestionsChecklist";
+import { Button } from "@/components/ui/button";
+import { useAnalysis } from "@/context/AnalysisContext";
+import { DollarSign, Bike, AlertTriangle, GitCompareArrows, Download, RotateCcw } from "lucide-react";
+import { toast } from "sonner";
+
+const Results = () => {
+  const navigate = useNavigate();
+  const { result } = useAnalysis();
+
+  useEffect(() => {
+    if (!result) navigate("/", { replace: true });
+  }, [result, navigate]);
+
+  if (!result) return null;
+
+  const handleDownload = () => {
+    const lines = [
+      "LeaseLens — Housing Risk Summary",
+      "==================================",
+      `Overall Score: ${result.overallScore}/100 (${result.riskLabel})`,
+      `Recommendation: ${result.recommendation}`,
+      "",
+      `Summary: ${result.summary}`,
+      "",
+      "Score Breakdown:",
+      `  Lease Safety:   ${result.breakdown.leaseSafety}/100`,
+      `  Affordability:  ${result.breakdown.affordability}/100`,
+      `  Location:       ${result.breakdown.location}/100`,
+      `  Student Fit:    ${result.breakdown.studentFit}/100`,
+      "",
+      "Risky Clauses:",
+      ...result.riskFlags.flatMap((f) => [
+        `  • [${f.severity.toUpperCase()}] ${f.title} (${f.category})`,
+        `      ${f.explanation}`,
+        `      Action: ${f.studentAction}`,
+      ]),
+      "",
+      "Questions to Ask Landlord:",
+      ...result.questions.map((q) => `  - ${q}`),
+      "",
+      "LeaseLens is an educational tool and does not provide legal advice.",
+    ].join("\n");
+
+    const blob = new Blob([lines], { type: "text/plain" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "leaselens-summary.txt";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Summary downloaded");
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-hero">
+      <Header />
+      <main className="container py-8 md:py-12 space-y-8">
+        <ScoreCard
+          score={result.overallScore}
+          riskLabel={result.riskLabel}
+          recommendation={result.recommendation}
+          summary={result.summary}
+        />
+
+        <section>
+          <h3 className="font-display text-xl font-extrabold text-foreground mb-4">
+            Score breakdown
+          </h3>
+          <ScoreBreakdown breakdown={result.breakdown} />
+        </section>
+
+        <section>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-display text-xl font-extrabold text-foreground flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-caution" />
+              Risky clauses found
+            </h3>
+            <span className="text-sm text-muted-foreground">
+              {result.riskFlags.length} flag{result.riskFlags.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {result.riskFlags.map((flag, i) => (
+              <RiskFlagCard key={i} flag={flag} />
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h3 className="font-display text-xl font-extrabold text-foreground mb-4">
+            Price & location insights
+          </h3>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <InsightCard
+              icon={DollarSign}
+              title="Price Insight"
+              headline={result.priceInsight.headline}
+              primaryLabel="Your rent"
+              primaryValue={result.priceInsight.rent}
+              secondaryLabel="Sample area average"
+              secondaryValue={result.priceInsight.areaAverage}
+              accent="orange"
+            />
+            <InsightCard
+              icon={Bike}
+              title="Commute Insight"
+              headline={result.commuteInsight.headline}
+              primaryLabel="Commute"
+              primaryValue={result.commuteInsight.commute}
+              secondaryLabel="Transport note"
+              secondaryValue={result.commuteInsight.transportNote}
+              accent="green"
+            />
+          </div>
+        </section>
+
+        <section>
+          <LandlordQuestionsChecklist questions={result.questions} />
+        </section>
+
+        <section className="flex flex-col sm:flex-row gap-3 pt-4">
+          <Button
+            onClick={() => navigate("/compare")}
+            className="bg-gradient-primary hover:opacity-95 text-primary-foreground font-semibold h-12 px-6 shadow-card"
+          >
+            <GitCompareArrows className="h-4 w-4 mr-2" />
+            Compare Another Option
+          </Button>
+          <Button
+            onClick={handleDownload}
+            variant="outline"
+            className="font-semibold h-12 px-6 border-primary/30 text-primary hover:bg-primary-soft hover:text-primary"
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Download Summary
+          </Button>
+          <Button
+            onClick={() => navigate("/")}
+            variant="ghost"
+            className="font-semibold h-12 px-6 text-muted-foreground hover:text-foreground"
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Start New Analysis
+          </Button>
+        </section>
+
+        <p className="text-xs text-center text-muted-foreground pt-2">
+          LeaseLens is an educational tool and does not provide legal advice.
+        </p>
+      </main>
+    </div>
+  );
+};
+
+export default Results;
