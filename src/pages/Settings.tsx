@@ -3,6 +3,8 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { parseMonthlyBudget } from "@/lib/pricing";
+import { recalculateSavedAnalysesForBudget } from "@/lib/savedAnalyses";
 import { toast } from "sonner";
 
 const DEFAULT_MONTHLY_BUDGET = "2000";
@@ -16,6 +18,24 @@ const Settings = () => {
       setMonthlyBudget(savedBudget);
     }
   }, []);
+
+  const handleSave = () => {
+    const savedBudget = monthlyBudget.trim() || DEFAULT_MONTHLY_BUDGET;
+    const parsedBudget = parseMonthlyBudget(savedBudget);
+    const updatedAnalyses = recalculateSavedAnalysesForBudget(parsedBudget);
+
+    localStorage.setItem("monthlyBudget", String(parsedBudget));
+    setMonthlyBudget(String(parsedBudget));
+
+    toast.success("Budget saved", {
+      description:
+        updatedAnalyses.length > 0
+          ? `${updatedAnalyses.length} saved comparison report${
+              updatedAnalyses.length === 1 ? "" : "s"
+            } updated.`
+          : "Future analyses will use this budget.",
+    });
+  };
 
   return (
     <AppLayout>
@@ -64,13 +84,7 @@ const Settings = () => {
         </section>
 
         <Button
-          onClick={() => {
-            localStorage.setItem(
-              "monthlyBudget",
-              monthlyBudget.trim() || DEFAULT_MONTHLY_BUDGET,
-            );
-            toast.success("Budget saved");
-          }}
+          onClick={handleSave}
           className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg h-11 px-6"
         >
           Save changes

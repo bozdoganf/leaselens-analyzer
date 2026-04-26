@@ -1,4 +1,5 @@
 import type { AnalysisResult, SavedLeaseAnalysis } from "./types";
+import { recalculateAnalysisForBudget } from "./pricing";
 
 const SAVED_ANALYSES_KEY = "savedLeaseAnalyses";
 
@@ -81,4 +82,16 @@ export function deleteSavedAnalysis(id: string) {
   localStorage.setItem(SAVED_ANALYSES_KEY, JSON.stringify(saved));
 
   return saved;
+}
+
+export function recalculateSavedAnalysesForBudget(monthlyBudget: number) {
+  const saved = getSavedAnalyses();
+  const updated = saved.map((analysis) => ({
+    ...analysis,
+    result: recalculateAnalysisForBudget(analysis.result, monthlyBudget),
+  }));
+
+  localStorage.setItem(SAVED_ANALYSES_KEY, JSON.stringify(updated));
+
+  return updated;
 }

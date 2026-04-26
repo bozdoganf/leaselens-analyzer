@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 const navLinks = [
-  { label: "Dashboard", to: "/dashboard" },
   { label: "My Leases", to: "/my-leases" },
   { label: "Market Insights", to: "/market-insights" },
   { label: "Help", to: "/help" },

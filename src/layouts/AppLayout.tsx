@@ -1,12 +1,11 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Plus, LayoutDashboard, BarChart3, GitCompareArrows, Settings, HelpCircle, LogOut } from "lucide-react";
+import { Plus, BarChart3, GitCompareArrows, Settings, HelpCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
 
 const primaryNav = [
-  { label: "Overview", to: "/dashboard", icon: LayoutDashboard },
   { label: "Analysis", to: "/results", icon: BarChart3 },
   { label: "Compare", to: "/compare", icon: GitCompareArrows },
   { label: "Settings", to: "/settings", icon: Settings },
@@ -42,7 +41,6 @@ export const AppLayout = ({ children }: { children: ReactNode }) => {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === "/dashboard"}
               className={({ isActive }) =>
                 cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-base",

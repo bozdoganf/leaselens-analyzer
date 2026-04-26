@@ -7,7 +7,6 @@ import { AnalysisProvider } from "@/context/AnalysisContext";
 import Index from "./pages/Index.tsx";
 import Upload from "./pages/Upload.tsx";
 import Analyzing from "./pages/Analyzing.tsx";
-import Dashboard from "./pages/Dashboard.tsx";
 import Results from "./pages/Results.tsx";
 import Compare from "./pages/Compare.tsx";
 import MyLeases from "./pages/MyLeases.tsx";
@@ -37,7 +36,6 @@ const App = () => (
             <Route path="/sign-in" element={<SignIn />} />
 
             {/* App */}
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/analyzing" element={<Analyzing />} />
             <Route path="/results" element={<Results />} />
             <Route path="/compare" element={<Compare />} />
