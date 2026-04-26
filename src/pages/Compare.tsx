@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Eye,
   GitCompareArrows,
+  NotebookPen,
   Plus,
   ShieldCheck,
   Trash2,
@@ -55,9 +56,19 @@ function getTopRisk(analysis: SavedLeaseAnalysis) {
   );
 }
 
+function formatNotesPreview(notes: string) {
+  const trimmed = notes.trim();
+
+  if (!trimmed) {
+    return "No notes";
+  }
+
+  return trimmed.length > 80 ? `${trimmed.slice(0, 80)}...` : trimmed;
+}
+
 const Compare = () => {
   const navigate = useNavigate();
-  const { setResult } = useAnalysis();
+  const { setResult, setNotes } = useAnalysis();
   const [savedAnalyses, setSavedAnalyses] = useState<SavedLeaseAnalysis[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -88,6 +99,7 @@ const Compare = () => {
 
   const handleViewReport = (analysis: SavedLeaseAnalysis) => {
     setResult(analysis.result);
+    setNotes(analysis.notes ?? "");
     navigate("/results");
   };
 
@@ -209,6 +221,9 @@ const Compare = () => {
                         Top Risk
                       </th>
                       <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Notes
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
                         Actions
                       </th>
                     </tr>
@@ -258,6 +273,9 @@ const Compare = () => {
                           </td>
                           <td className="px-5 py-4 text-muted-foreground">
                             {topRisk ? topRisk.title : "No major risk"}
+                          </td>
+                          <td className="px-5 py-4 text-muted-foreground max-w-xs">
+                            {formatNotesPreview(analysis.notes ?? "")}
                           </td>
                           <td className="px-5 py-4">
                             <div className="flex flex-wrap gap-2">
@@ -366,6 +384,15 @@ const Compare = () => {
                           </span>
                           <p className="text-sm font-semibold text-foreground">
                             {topRisk ? topRisk.title : "No major risk"}
+                          </p>
+                        </div>
+                        <div className="rounded-xl bg-primary-soft/40 border border-primary/15 px-3 py-2">
+                          <span className="flex items-center gap-2 text-sm font-semibold text-primary mb-1">
+                            <NotebookPen className="h-4 w-4" />
+                            Notes
+                          </span>
+                          <p className="text-sm text-foreground whitespace-pre-wrap">
+                            {(analysis.notes ?? "").trim() || "No notes yet."}
                           </p>
                         </div>
                       </div>

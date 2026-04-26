@@ -6,14 +6,15 @@ import { ScoreBreakdown } from "@/components/ScoreBreakdown";
 import { RiskFlagCard } from "@/components/RiskFlagCard";
 import { LandlordQuestionsChecklist } from "@/components/LandlordQuestionsChecklist";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { useAnalysis } from "@/context/AnalysisContext";
 import { saveAnalysis } from "@/lib/savedAnalyses";
-import { AlertTriangle, BookmarkPlus, GitCompareArrows, Download, RotateCcw } from "lucide-react";
+import { AlertTriangle, BookmarkPlus, GitCompareArrows, Download, NotebookPen, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 const Results = () => {
   const navigate = useNavigate();
-  const { result } = useAnalysis();
+  const { result, notes, setNotes } = useAnalysis();
 
   useEffect(() => {
     if (!result) navigate("/upload", { replace: true });
@@ -34,8 +35,10 @@ const Results = () => {
       `  Lease Safety:   ${result.breakdown.leaseSafety}/100`,
       `  Affordability:  ${result.breakdown.affordability}/100`,
       `  Location:       ${result.breakdown.location}/100`,
-      `  Student Fit:    ${result.breakdown.studentFit}/100`,
       "",
+      ...(notes.trim()
+        ? ["Notes:", notes.trim(), ""]
+        : []),
       "Risky Clauses:",
       ...result.riskFlags.flatMap((f) => [
         `  • [${f.severity.toUpperCase()}] ${f.title} (${f.category})`,
@@ -60,10 +63,17 @@ const Results = () => {
   };
 
   const handleSaveToCompare = () => {
-    const saved = saveAnalysis(result);
+    const saved = saveAnalysis(result, notes);
 
-    if (saved.alreadySaved) {
+    if (saved.status === "already-saved") {
       toast.warning("You already saved this in compare", {
+        description: saved.analysis.name,
+      });
+      return;
+    }
+
+    if (saved.status === "notes-updated") {
+      toast.success("Saved notes updated", {
         description: saved.analysis.name,
       });
       return;
@@ -117,6 +127,21 @@ const Results = () => {
 
         <section>
           <LandlordQuestionsChecklist questions={result.questions} />
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-5 shadow-card">
+          <div className="flex items-center gap-2 mb-3">
+            <NotebookPen className="h-5 w-5 text-primary" />
+            <h2 className="font-display text-xl font-extrabold text-foreground">
+              Notes
+            </h2>
+          </div>
+          <Textarea
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder="Add reminders, landlord questions, or personal concerns..."
+            className="min-h-28 resize-y bg-background"
+          />
         </section>
 
         <section className="flex flex-col sm:flex-row gap-3 pt-2">

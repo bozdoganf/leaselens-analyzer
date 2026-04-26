@@ -80,14 +80,12 @@ function calculateOverallScore(breakdown: {
   leaseSafety: number;
   affordability: number;
   location: number;
-  studentFit: number;
 }) {
   return Math.round(
     (breakdown.leaseSafety +
       breakdown.affordability +
-      breakdown.location +
-      breakdown.studentFit) /
-      4,
+      breakdown.location) /
+      3,
   );
 }
 

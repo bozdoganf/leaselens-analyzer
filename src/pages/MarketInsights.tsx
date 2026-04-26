@@ -1,11 +1,11 @@
 import { MarketingLayout } from "@/layouts/MarketingLayout";
-import { TrendingUp, MapPin, Wallet, GraduationCap } from "lucide-react";
+import { TrendingUp, MapPin, Wallet, AlertTriangle } from "lucide-react";
 
 const stats = [
   { icon: Wallet, label: "Avg. student rent (2BR)", value: "$1,025", note: "in college zones" },
   { icon: TrendingUp, label: "Year-over-year change", value: "+4.2%", note: "moderate increase" },
   { icon: MapPin, label: "Most-flagged neighborhood", value: "West Campus", note: "auto-renewal clauses" },
-  { icon: GraduationCap, label: "Common student fit score", value: "72/100", note: "across analyzed leases" },
+  { icon: AlertTriangle, label: "Common high-risk flags", value: "3.4", note: "per analyzed lease" },
 ];
 
 const MarketInsights = () => (

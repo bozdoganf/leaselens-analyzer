@@ -5,7 +5,7 @@ export const LoadingState = () => {
     "Reading lease language...",
     "Checking clauses for risk...",
     "Comparing rent to area average...",
-    "Estimating commute & student fit...",
+    "Estimating location context...",
   ];
   return (
     <div className="flex flex-col items-center justify-center py-16 px-4 animate-fade-in-up">
@@ -38,7 +38,7 @@ export const LoadingState = () => {
           Analyzing lease language...
         </h3>
         <p className="text-sm text-muted-foreground">
-          Checking clauses, price, location, and student fit.
+          Checking clauses, price, and location.
         </p>
         <ul className="mt-6 space-y-2 text-left">
           {steps.map((s, i) => (

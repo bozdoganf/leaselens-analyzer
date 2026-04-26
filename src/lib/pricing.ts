@@ -45,9 +45,8 @@ export function calculateOverallScore(breakdown: ScoreBreakdown) {
   return Math.round(
     (breakdown.leaseSafety +
       breakdown.affordability +
-      breakdown.location +
-      breakdown.studentFit) /
-      4,
+      breakdown.location) /
+      3,
   );
 }
 
@@ -62,8 +61,9 @@ export function recalculateAnalysisForBudget(
   }
 
   const breakdown = {
-    ...result.breakdown,
+    leaseSafety: result.breakdown.leaseSafety,
     affordability: calculateAffordabilityScore(monthlyRent, monthlyBudget),
+    location: result.breakdown.location,
   };
 
   return {

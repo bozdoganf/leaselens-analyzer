@@ -16,7 +16,7 @@ function getSavedMonthlyBudget() {
 
 const Upload = () => {
   const navigate = useNavigate();
-  const { setResult, setDetails } = useAnalysis();
+  const { setResult, setDetails, setNotes } = useAnalysis();
   const [leaseText, setLeaseText] = useState("");
 
   const handleAnalyze = async () => {
@@ -33,6 +33,7 @@ const Upload = () => {
 
     setDetails(detailsForAnalysis);
     setResult(null);
+    setNotes("");
     navigate("/analyzing", {
       state: { leaseText, details: detailsForAnalysis },
     });

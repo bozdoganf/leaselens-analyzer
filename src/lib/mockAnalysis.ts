@@ -36,7 +36,6 @@ export function getMockAnalysis(_text: string, _details: HousingDetails): Analys
       leaseSafety: 65,
       affordability: 78,
       location: 82,
-      studentFit: 70,
     },
     riskFlags: [
       {

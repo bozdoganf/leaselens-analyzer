@@ -50,8 +50,7 @@ Return JSON exactly in this shape:
   "breakdown": {
     "leaseSafety": 0,
     "affordability": 0,
-    "location": 0,
-    "studentFit": 0
+    "location": 0
   },
   "riskFlags": [
     {
@@ -87,7 +86,6 @@ Rules:
 - breakdown.leaseSafety must be a number from 0 to 100.
 - breakdown.affordability must be a number from 0 to 100.
 - breakdown.location must be a number from 0 to 100.
-- breakdown.studentFit must be a number from 0 to 100.
 - riskFlags must be an array of objects, not strings.
 - riskFlags[].severity must be exactly one of: "low", "medium", "high".
 - priceInsight must be an object, not a string.

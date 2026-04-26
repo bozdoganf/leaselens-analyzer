@@ -16,7 +16,6 @@ export const analysisSchema = z.object({
     leaseSafety: z.number().min(0).max(100),
     affordability: z.number().min(0).max(100),
     location: z.number().min(0).max(100),
-    studentFit: z.number().min(0).max(100),
   }),
 
   riskFlags: z.array(

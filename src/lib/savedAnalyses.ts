@@ -1,5 +1,5 @@
 import type { AnalysisResult, SavedLeaseAnalysis } from "./types";
-import { recalculateAnalysisForBudget } from "./pricing";
+import { parseMonthlyBudget, recalculateAnalysisForBudget } from "./pricing";
 
 const SAVED_ANALYSES_KEY = "savedLeaseAnalyses";
 
@@ -42,13 +42,22 @@ export function getSavedAnalyses(): SavedLeaseAnalysis[] {
 
   try {
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) {
+      return [];
+    }
+
+    const monthlyBudget = parseMonthlyBudget(localStorage.getItem("monthlyBudget"));
+    return parsed.map((analysis) => ({
+      ...analysis,
+      notes: analysis.notes ?? "",
+      result: recalculateAnalysisForBudget(analysis.result, monthlyBudget),
+    }));
   } catch {
     return [];
   }
 }
 
-export function saveAnalysis(result: AnalysisResult) {
+export function saveAnalysis(result: AnalysisResult, notes = "") {
   const saved = getSavedAnalyses();
   const fingerprint = getAnalysisFingerprint(result);
   const existing = saved.find(
@@ -56,9 +65,26 @@ export function saveAnalysis(result: AnalysisResult) {
   );
 
   if (existing) {
+    if ((existing.notes ?? "") !== notes) {
+      const updatedAnalysis = {
+        ...existing,
+        notes,
+      };
+      const updated = saved.map((analysis) =>
+        analysis.id === existing.id ? updatedAnalysis : analysis,
+      );
+
+      localStorage.setItem(SAVED_ANALYSES_KEY, JSON.stringify(updated));
+
+      return {
+        analysis: updatedAnalysis,
+        status: "notes-updated" as const,
+      };
+    }
+
     return {
       analysis: existing,
-      alreadySaved: true,
+      status: "already-saved" as const,
     };
   }
 
@@ -66,6 +92,7 @@ export function saveAnalysis(result: AnalysisResult) {
     id: crypto.randomUUID(),
     name: getFallbackName(result, saved.length),
     createdAt: new Date().toISOString(),
+    notes,
     result,
   };
 
@@ -73,7 +100,7 @@ export function saveAnalysis(result: AnalysisResult) {
 
   return {
     analysis,
-    alreadySaved: false,
+    status: "created" as const,
   };
 }
 

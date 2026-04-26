@@ -19,7 +19,6 @@ export interface ScoreBreakdown {
   leaseSafety: number;
   affordability: number;
   location: number;
-  studentFit: number;
 }
 
 export interface AnalysisResult {
@@ -58,6 +57,7 @@ export interface SavedLeaseAnalysis {
   id: string;
   name: string;
   createdAt: string;
+  notes: string;
   result: AnalysisResult;
 }
 
@@ -70,5 +70,3 @@ export interface CompareOption {
   mainRisk: string;
   recommendation: string;
 }
-
-

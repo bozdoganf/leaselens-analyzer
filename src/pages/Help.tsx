@@ -13,7 +13,7 @@ const faqs = [
   },
   {
     q: "How is the score calculated?",
-    a: "We weigh four pillars: lease safety, affordability, location, and student fit. Each is scored 0–100 and combined into your overall housing risk score.",
+    a: "We weigh three pillars: lease safety, affordability, and location. Each is scored 0–100 and combined into your overall housing risk score.",
   },
   {
     q: "Which file formats are supported?",

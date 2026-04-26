@@ -45,7 +45,7 @@ const Analyzing = () => {
               Analyzing lease language…
             </h3>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Checking clauses, price, location, and student fit.
+              Checking clauses, price, and location.
             </p>
             <div className="mt-5 flex items-center gap-2 text-xs font-semibold text-primary">
               <ScanLine className="h-3.5 w-3.5 animate-pulse" />

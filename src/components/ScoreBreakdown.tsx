@@ -1,4 +1,4 @@
-import { ShieldCheck, Wallet, MapPin, GraduationCap } from "lucide-react";
+import { ShieldCheck, Wallet, MapPin } from "lucide-react";
 import type { ScoreBreakdown as ScoreBreakdownType } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -16,12 +16,11 @@ const items = [
   { key: "leaseSafety" as const, label: "Lease Safety", icon: ShieldCheck },
   { key: "affordability" as const, label: "Affordability", icon: Wallet },
   { key: "location" as const, label: "Location", icon: MapPin },
-  { key: "studentFit" as const, label: "Student Fit", icon: GraduationCap },
 ];
 
 export const ScoreBreakdown = ({ breakdown }: ScoreBreakdownProps) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       {items.map(({ key, label, icon: Icon }, idx) => {
         const value = breakdown[key];
         const tone = getTone(value);
