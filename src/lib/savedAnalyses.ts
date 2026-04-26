@@ -29,6 +29,22 @@ function getAnalysisFingerprint(result: AnalysisResult) {
   });
 }
 
+function normalizeQuestionKeys(keys: string[] = []) {
+  return [...new Set(keys.filter(Boolean))];
+}
+
+function haveSameQuestionKeys(a: string[] = [], b: string[] = []) {
+  const normalizedA = normalizeQuestionKeys(a);
+  const normalizedB = normalizeQuestionKeys(b);
+
+  if (normalizedA.length !== normalizedB.length) {
+    return false;
+  }
+
+  const bKeys = new Set(normalizedB);
+  return normalizedA.every((key) => bKeys.has(key));
+}
+
 export function getSavedAnalyses(): SavedLeaseAnalysis[] {
   if (!isBrowser()) {
     return [];
@@ -50,6 +66,7 @@ export function getSavedAnalyses(): SavedLeaseAnalysis[] {
     return parsed.map((analysis) => ({
       ...analysis,
       notes: analysis.notes ?? "",
+      reviewedQuestionKeys: normalizeQuestionKeys(analysis.reviewedQuestionKeys ?? []),
       result: recalculateAnalysisForBudget(analysis.result, monthlyBudget),
     }));
   } catch {
@@ -57,18 +74,30 @@ export function getSavedAnalyses(): SavedLeaseAnalysis[] {
   }
 }
 
-export function saveAnalysis(result: AnalysisResult, notes = "") {
+export function saveAnalysis(
+  result: AnalysisResult,
+  notes = "",
+  reviewedQuestionKeys: string[] = [],
+) {
   const saved = getSavedAnalyses();
   const fingerprint = getAnalysisFingerprint(result);
   const existing = saved.find(
     (analysis) => getAnalysisFingerprint(analysis.result) === fingerprint,
   );
+  const normalizedReviewedQuestionKeys = normalizeQuestionKeys(reviewedQuestionKeys);
 
   if (existing) {
-    if ((existing.notes ?? "") !== notes) {
+    const notesChanged = (existing.notes ?? "") !== notes;
+    const reviewedQuestionsChanged = !haveSameQuestionKeys(
+      existing.reviewedQuestionKeys,
+      normalizedReviewedQuestionKeys,
+    );
+
+    if (notesChanged || reviewedQuestionsChanged) {
       const updatedAnalysis = {
         ...existing,
         notes,
+        reviewedQuestionKeys: normalizedReviewedQuestionKeys,
       };
       const updated = saved.map((analysis) =>
         analysis.id === existing.id ? updatedAnalysis : analysis,
@@ -78,7 +107,7 @@ export function saveAnalysis(result: AnalysisResult, notes = "") {
 
       return {
         analysis: updatedAnalysis,
-        status: "notes-updated" as const,
+        status: notesChanged ? "notes-updated" as const : "questions-updated" as const,
       };
     }
 
@@ -93,6 +122,7 @@ export function saveAnalysis(result: AnalysisResult, notes = "") {
     name: getFallbackName(result, saved.length),
     createdAt: new Date().toISOString(),
     notes,
+    reviewedQuestionKeys: normalizedReviewedQuestionKeys,
     result,
   };
 

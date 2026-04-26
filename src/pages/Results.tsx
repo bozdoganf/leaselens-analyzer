@@ -14,7 +14,13 @@ import { toast } from "sonner";
 
 const Results = () => {
   const navigate = useNavigate();
-  const { result, notes, setNotes } = useAnalysis();
+  const {
+    result,
+    notes,
+    setNotes,
+    reviewedQuestionKeys,
+    setReviewedQuestionKeys,
+  } = useAnalysis();
 
   useEffect(() => {
     if (!result) navigate("/upload", { replace: true });
@@ -63,7 +69,7 @@ const Results = () => {
   };
 
   const handleSaveToCompare = () => {
-    const saved = saveAnalysis(result, notes);
+    const saved = saveAnalysis(result, notes, reviewedQuestionKeys);
 
     if (saved.status === "already-saved") {
       toast.warning("You already saved this in compare", {
@@ -74,6 +80,13 @@ const Results = () => {
 
     if (saved.status === "notes-updated") {
       toast.success("Saved notes updated", {
+        description: saved.analysis.name,
+      });
+      return;
+    }
+
+    if (saved.status === "questions-updated") {
+      toast.success("Reviewed questions updated", {
         description: saved.analysis.name,
       });
       return;
@@ -126,7 +139,11 @@ const Results = () => {
         </section>
 
         <section>
-          <LandlordQuestionsChecklist questions={result.questions} />
+          <LandlordQuestionsChecklist
+            questions={result.questions}
+            reviewedQuestionKeys={reviewedQuestionKeys}
+            onReviewedQuestionKeysChange={setReviewedQuestionKeys}
+          />
         </section>
 
         <section className="rounded-2xl border border-border bg-card p-5 shadow-card">

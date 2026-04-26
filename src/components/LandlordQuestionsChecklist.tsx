@@ -1,20 +1,37 @@
-import { useState } from "react";
 import { CheckCircle2, Circle, MessageCircleQuestion } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface LandlordQuestionsChecklistProps {
   questions: string[];
+  reviewedQuestionKeys: string[];
+  onReviewedQuestionKeysChange: (keys: string[]) => void;
 }
 
-export const LandlordQuestionsChecklist = ({ questions }: LandlordQuestionsChecklistProps) => {
-  const [checked, setChecked] = useState<Set<number>>(new Set());
+function getQuestionKey(question: string) {
+  return question.trim().toLowerCase().replace(/\s+/g, " ");
+}
 
-  const toggle = (i: number) => {
-    setChecked((prev) => {
-      const next = new Set(prev);
-      next.has(i) ? next.delete(i) : next.add(i);
-      return next;
-    });
+export const LandlordQuestionsChecklist = ({
+  questions,
+  reviewedQuestionKeys,
+  onReviewedQuestionKeysChange,
+}: LandlordQuestionsChecklistProps) => {
+  const reviewedQuestions = new Set(reviewedQuestionKeys);
+  const reviewedCount = questions.filter((question) =>
+    reviewedQuestions.has(getQuestionKey(question)),
+  ).length;
+
+  const toggle = (question: string) => {
+    const questionKey = getQuestionKey(question);
+    const next = new Set(reviewedQuestionKeys);
+
+    if (next.has(questionKey)) {
+      next.delete(questionKey);
+    } else {
+      next.add(questionKey);
+    }
+
+    onReviewedQuestionKeysChange([...next]);
   };
 
   return (
@@ -28,17 +45,18 @@ export const LandlordQuestionsChecklist = ({ questions }: LandlordQuestionsCheck
             Questions to ask your landlord
           </h3>
           <p className="text-sm text-muted-foreground">
-            {checked.size} of {questions.length} reviewed
+            {reviewedCount} of {questions.length} reviewed
           </p>
         </div>
       </div>
       <ul className="space-y-2">
         {questions.map((q, i) => {
-          const isDone = checked.has(i);
+          const isDone = reviewedQuestions.has(getQuestionKey(q));
           return (
-            <li key={i}>
+            <li key={`${getQuestionKey(q)}-${i}`}>
               <button
-                onClick={() => toggle(i)}
+                onClick={() => toggle(q)}
+                aria-pressed={isDone}
                 className={cn(
                   "w-full text-left flex items-start gap-3 rounded-xl p-3 transition-base",
                   isDone

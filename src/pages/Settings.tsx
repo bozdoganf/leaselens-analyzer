@@ -3,37 +3,58 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { parseMonthlyBudget } from "@/lib/pricing";
 import { recalculateSavedAnalysesForBudget } from "@/lib/savedAnalyses";
+import {
+  CAMPUSES,
+  DEFAULT_UNIVERSITY_ID,
+  getCampusById,
+} from "../../shared/campuses";
 import { toast } from "sonner";
 
 const DEFAULT_MONTHLY_BUDGET = "2000";
 
 const Settings = () => {
   const [monthlyBudget, setMonthlyBudget] = useState(DEFAULT_MONTHLY_BUDGET);
+  const [universityId, setUniversityId] = useState(DEFAULT_UNIVERSITY_ID);
 
   useEffect(() => {
     const savedBudget = localStorage.getItem("monthlyBudget");
     if (savedBudget) {
       setMonthlyBudget(savedBudget);
     }
+
+    const savedUniversityId = localStorage.getItem("universityId");
+    if (savedUniversityId) {
+      setUniversityId(getCampusById(savedUniversityId).id);
+    }
   }, []);
 
   const handleSave = () => {
     const savedBudget = monthlyBudget.trim() || DEFAULT_MONTHLY_BUDGET;
     const parsedBudget = parseMonthlyBudget(savedBudget);
+    const selectedCampus = getCampusById(universityId);
     const updatedAnalyses = recalculateSavedAnalysesForBudget(parsedBudget);
 
     localStorage.setItem("monthlyBudget", String(parsedBudget));
+    localStorage.setItem("universityId", selectedCampus.id);
     setMonthlyBudget(String(parsedBudget));
+    setUniversityId(selectedCampus.id);
 
-    toast.success("Budget saved", {
+    toast.success("Settings saved", {
       description:
         updatedAnalyses.length > 0
           ? `${updatedAnalyses.length} saved comparison report${
               updatedAnalyses.length === 1 ? "" : "s"
-            } updated.`
-          : "Future analyses will use this budget.",
+            } updated. Future analyses will use ${selectedCampus.shortName}.`
+          : `Future analyses will use ${selectedCampus.shortName}.`,
     });
   };
 
@@ -54,7 +75,21 @@ const Settings = () => {
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="school">University</Label>
-              <Input id="school" placeholder="e.g. UT Austin" />
+              <Select value={universityId} onValueChange={setUniversityId}>
+                <SelectTrigger id="school">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CAMPUSES.map((campus) => (
+                    <SelectItem key={campus.id} value={campus.id}>
+                      {campus.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Used to compare lease addresses against campus commute distance.
+              </p>
             </div>
           </div>
         </section>

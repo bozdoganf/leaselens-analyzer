@@ -68,7 +68,7 @@ function formatNotesPreview(notes: string) {
 
 const Compare = () => {
   const navigate = useNavigate();
-  const { setResult, setNotes } = useAnalysis();
+  const { setResult, setNotes, setReviewedQuestionKeys } = useAnalysis();
   const [savedAnalyses, setSavedAnalyses] = useState<SavedLeaseAnalysis[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
@@ -100,6 +100,7 @@ const Compare = () => {
   const handleViewReport = (analysis: SavedLeaseAnalysis) => {
     setResult(analysis.result);
     setNotes(analysis.notes ?? "");
+    setReviewedQuestionKeys(analysis.reviewedQuestionKeys ?? []);
     navigate("/results");
   };
 

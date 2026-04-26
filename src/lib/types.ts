@@ -5,6 +5,7 @@ export type UtilitiesIncluded = "yes" | "no" | "unknown";
 
 export interface HousingDetails {
   monthlyBudget : string;
+  universityId?: string;
 }
 
 export interface RiskFlag {
@@ -58,6 +59,7 @@ export interface SavedLeaseAnalysis {
   name: string;
   createdAt: string;
   notes: string;
+  reviewedQuestionKeys: string[];
   result: AnalysisResult;
 }
 

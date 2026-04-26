@@ -5,6 +5,7 @@ import { UploadCard } from "@/components/UploadCard";
 import { Button } from "@/components/ui/button";
 import { useAnalysis } from "@/context/AnalysisContext";
 import type { HousingDetails } from "@/lib/types";
+import { DEFAULT_UNIVERSITY_ID } from "../../shared/campuses";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,9 +15,13 @@ function getSavedMonthlyBudget() {
   return localStorage.getItem("monthlyBudget") || DEFAULT_MONTHLY_BUDGET;
 }
 
+function getSavedUniversityId() {
+  return localStorage.getItem("universityId") || DEFAULT_UNIVERSITY_ID;
+}
+
 const Upload = () => {
   const navigate = useNavigate();
-  const { setResult, setDetails, setNotes } = useAnalysis();
+  const { setResult, setDetails, setNotes, setReviewedQuestionKeys } = useAnalysis();
   const [leaseText, setLeaseText] = useState("");
   const [leaseFile, setLeaseFile] = useState<File | null>(null);
 
@@ -30,11 +35,13 @@ const Upload = () => {
 
     const detailsForAnalysis: HousingDetails = {
       monthlyBudget: getSavedMonthlyBudget(),
+      universityId: getSavedUniversityId(),
     };
 
     setDetails(detailsForAnalysis);
     setResult(null);
     setNotes("");
+    setReviewedQuestionKeys([]);
     navigate("/analyzing", {
       state: { leaseText, details: detailsForAnalysis, fileName: leaseFile?.name },
     });
