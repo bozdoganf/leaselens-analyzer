@@ -4,11 +4,10 @@ import { AppLayout } from "@/layouts/AppLayout";
 import { ScoreCard } from "@/components/ScoreCard";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
 import { RiskFlagCard } from "@/components/RiskFlagCard";
-import { InsightCard } from "@/components/InsightCard";
 import { LandlordQuestionsChecklist } from "@/components/LandlordQuestionsChecklist";
 import { Button } from "@/components/ui/button";
 import { useAnalysis } from "@/context/AnalysisContext";
-import { DollarSign, Bike, AlertTriangle, GitCompareArrows, Download, RotateCcw } from "lucide-react";
+import { AlertTriangle, GitCompareArrows, Download, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 const Results = () => {
@@ -97,34 +96,6 @@ const Results = () => {
             {result.riskFlags.map((flag, i) => (
               <RiskFlagCard key={i} flag={flag} />
             ))}
-          </div>
-        </section>
-
-        <section>
-          <h2 className="font-display text-xl font-extrabold text-foreground mb-4">
-            Price & location insights
-          </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <InsightCard
-              icon={DollarSign}
-              title="Price Insight"
-              headline={result.priceInsight.headline}
-              primaryLabel="Your rent"
-              primaryValue={result.priceInsight.rent}
-              secondaryLabel="Sample area average"
-              secondaryValue={result.priceInsight.areaAverage}
-              accent="orange"
-            />
-            <InsightCard
-              icon={Bike}
-              title="Commute Insight"
-              headline={result.commuteInsight.headline}
-              primaryLabel="Commute"
-              primaryValue={result.commuteInsight.commute}
-              secondaryLabel="Transport note"
-              secondaryValue={result.commuteInsight.transportNote}
-              accent="green"
-            />
           </div>
         </section>
 

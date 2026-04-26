@@ -1,54 +1,41 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MarketingLayout } from "@/layouts/MarketingLayout";
 import { UploadCard } from "@/components/UploadCard";
-import { HousingDetailsForm } from "@/components/HousingDetailsForm";
 import { Button } from "@/components/ui/button";
 import { useAnalysis } from "@/context/AnalysisContext";
-import { SAMPLE_LEASE_TEXT } from "@/lib/mockAnalysis";
 import type { HousingDetails } from "@/lib/types";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
-const defaultDetails: HousingDetails = {
-  monthlyRent: "1050",
-  neighborhood: "West Campus",
-  bedrooms: "2",
-  commuteMinutes: "18",
-  utilitiesIncluded: "unknown",
-  hasCar: false,
-};
+const DEFAULT_MONTHLY_BUDGET = "2000";
+
+function getSavedMonthlyBudget() {
+  return localStorage.getItem("monthlyBudget") || DEFAULT_MONTHLY_BUDGET;
+}
 
 const Upload = () => {
   const navigate = useNavigate();
-  const [params] = useSearchParams();
   const { setResult, setDetails } = useAnalysis();
   const [leaseText, setLeaseText] = useState("");
-  const [details, setLocalDetails] = useState<HousingDetails>(defaultDetails);
-
-  useEffect(() => {
-    if (params.get("sample") === "1") {
-      setLeaseText(SAMPLE_LEASE_TEXT);
-      toast.success("Sample lease loaded");
-    }
-  }, [params]);
-
-  const handleSample = () => {
-    setLeaseText(SAMPLE_LEASE_TEXT);
-    toast.success("Sample lease loaded");
-  };
 
   const handleAnalyze = async () => {
     if (!leaseText.trim()) {
       toast.error("Add lease text first", {
-        description: "Paste a lease or click 'Try Sample Lease' to continue.",
+        description: "Paste lease text or upload a text file to continue.",
       });
       return;
     }
 
-    setDetails(details);
+    const detailsForAnalysis: HousingDetails = {
+      monthlyBudget: getSavedMonthlyBudget(),
+    };
+
+    setDetails(detailsForAnalysis);
     setResult(null);
-    navigate("/analyzing", { state: { leaseText, details } });
+    navigate("/analyzing", {
+      state: { leaseText, details: detailsForAnalysis },
+    });
 
     try {
       const response = await fetch("/api/analyze-lease", {
@@ -58,7 +45,7 @@ const Upload = () => {
         },
         body: JSON.stringify({
           leaseText,
-          details,
+          details: detailsForAnalysis,
         }),
       });
 
@@ -76,7 +63,6 @@ const Upload = () => {
       navigate("/upload");
     }
   };
-
 
   return (
     <MarketingLayout>
@@ -97,43 +83,31 @@ const Upload = () => {
             Start Analysis
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={handleSample}
-            className="font-semibold rounded-full h-12 px-7 border-border bg-card text-foreground hover:bg-secondary"
-          >
-            Try Sample Lease
-          </Button>
         </div>
       </section>
 
       <section className="container pb-20">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="max-w-3xl mx-auto">
           <div className="rounded-2xl border border-border bg-card p-6 md:p-7 shadow-card">
             <div className="mb-5">
-              <h2 className="font-display text-xl font-bold text-foreground">Upload Document</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">PDF, DOCX, or images up to 10MB.</p>
+              <h2 className="font-display text-xl font-bold text-foreground">
+                Upload Document
+              </h2>
+              <p className="text-sm text-muted-foreground mt-0.5">
+                PDF, DOCX, or images up to 10MB.
+              </p>
             </div>
             <UploadCard
               leaseText={leaseText}
               onLeaseTextChange={setLeaseText}
-              onSampleClick={handleSample}
             />
-          </div>
-
-          <div className="rounded-2xl border border-border bg-card p-6 md:p-7 shadow-card">
-            <div className="mb-5">
-              <h2 className="font-display text-xl font-bold text-foreground">Housing Details</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Help us provide accurate market context.
-              </p>
-            </div>
-            <HousingDetailsForm
-              details={details}
-              onChange={setLocalDetails}
-              onSubmit={handleAnalyze}
-            />
+            <Button
+              onClick={handleAnalyze}
+              className="mt-6 w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg h-11 shadow-soft"
+            >
+              Analyze Lease
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </div>
       </section>

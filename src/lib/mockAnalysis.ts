@@ -27,6 +27,11 @@ export function getMockAnalysis(_text: string, _details: HousingDetails): Analys
     recommendation: "Proceed with caution",
     summary:
       "This lease may be workable, but clarify renewal, maintenance, and fee language before signing.",
+    extracted: {
+      monthlyRent: 1050,
+      propertyAddress: null,
+      leaseTerm: "12 months",
+    },
     breakdown: {
       leaseSafety: 65,
       affordability: 78,
@@ -78,6 +83,11 @@ export function getMockAnalysis(_text: string, _details: HousingDetails): Analys
       "What is the written maintenance response timeline?",
       "Are there any move-in, cleaning, or administrative fees not shown here?",
     ],
+    emailTemplate: {
+      subject: "Questions about lease terms",
+      body:
+        "Hi, I am reviewing the lease and wanted to clarify the renewal terms, maintenance timeline, included utilities, and any additional move-in or move-out fees before signing. Thank you.",
+    },
   };
 }
 

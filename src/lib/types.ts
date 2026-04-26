@@ -4,12 +4,7 @@ export type Severity = "low" | "medium" | "high";
 export type UtilitiesIncluded = "yes" | "no" | "unknown";
 
 export interface HousingDetails {
-  monthlyRent: string;
-  neighborhood: string;
-  bedrooms: string;
-  commuteMinutes: string;
-  utilitiesIncluded: UtilitiesIncluded;
-  hasCar: boolean;
+  monthlyBudget : string;
 }
 
 export interface RiskFlag {
@@ -32,18 +27,26 @@ export interface AnalysisResult {
   riskLabel: string;
   recommendation: string;
   summary: string;
+  extracted: {
+    monthlyRent : number | null;
+    propertyAddress : string | null;
+    leaseTerm : string | null;
+  };
   breakdown: ScoreBreakdown;
   riskFlags: RiskFlag[];
+
   priceInsight: {
     headline: string;
     rent: string;
     areaAverage: string;
   };
+
   commuteInsight: {
     headline: string;
     commute: string;
     transportNote: string;
   };
+  
   questions: string[];
   emailTemplate: { // new emailTemplate class
     subject: string;

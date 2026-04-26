@@ -42,6 +42,11 @@ Return JSON exactly in this shape:
   "riskLabel": "",
   "recommendation": "",
   "summary": "",
+  "extracted": {
+    "monthlyRent": null,
+    "propertyAddress": null,
+    "leaseTerm": null
+  },
   "breakdown": {
     "leaseSafety": 0,
     "affordability": 0,
@@ -76,6 +81,9 @@ Return JSON exactly in this shape:
 
 Rules:
 - overallScore must be a number from 0 to 100.
+- extracted.monthlyRent must be the monthly rent as a number only, with no dollar sign or text. Use null if the monthly rent is not found.
+- extracted.propertyAddress should be the property address as a string. Use null if not found.
+- extracted.leaseTerm should be the lease term as a string. Use null if not found.
 - breakdown.leaseSafety must be a number from 0 to 100.
 - breakdown.affordability must be a number from 0 to 100.
 - breakdown.location must be a number from 0 to 100.

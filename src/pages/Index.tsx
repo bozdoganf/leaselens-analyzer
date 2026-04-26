@@ -39,14 +39,6 @@ const Index = () => {
             Start Analysis
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="font-semibold h-12 px-7 rounded-full border-border bg-card text-foreground hover:bg-secondary"
-          >
-            <Link to="/upload?sample=1">Try Sample Lease</Link>
-          </Button>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs font-medium text-muted-foreground">

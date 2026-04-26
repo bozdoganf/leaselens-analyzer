@@ -6,10 +6,9 @@ import { cn } from "@/lib/utils";
 interface UploadCardProps {
   leaseText: string;
   onLeaseTextChange: (text: string) => void;
-  onSampleClick: () => void;
 }
 
-export const UploadCard = ({ leaseText, onLeaseTextChange, onSampleClick }: UploadCardProps) => {
+export const UploadCard = ({ leaseText, onLeaseTextChange }: UploadCardProps) => {
   const [dragActive, setDragActive] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -84,14 +83,6 @@ export const UploadCard = ({ leaseText, onLeaseTextChange, onSampleClick }: Uplo
         placeholder="Paste the full text of your lease agreement here..."
         className="min-h-[180px] resize-y text-sm leading-relaxed bg-card border-border focus-visible:ring-1 focus-visible:ring-primary"
       />
-
-      <button
-        type="button"
-        onClick={onSampleClick}
-        className="text-xs font-semibold text-primary hover:text-primary/80 transition-base"
-      >
-        ✨ Try Sample Lease →
-      </button>
     </div>
   );
 };

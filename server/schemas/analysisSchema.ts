@@ -6,6 +6,12 @@ export const analysisSchema = z.object({
   recommendation: z.string(),
   summary: z.string(),
 
+  extracted: z.object({
+    monthlyRent: z.number().min(0).nullable(),
+    propertyAddress: z.string().nullable(),
+    leaseTerm: z.string().nullable(),
+  }),
+
   breakdown: z.object({
     leaseSafety: z.number().min(0).max(100),
     affordability: z.number().min(0).max(100),
