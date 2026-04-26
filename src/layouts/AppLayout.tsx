@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from "react-router-dom";
-import { Plus, LayoutDashboard, BarChart3, LineChart, Settings, HelpCircle, LogOut } from "lucide-react";
+import { Plus, LayoutDashboard, BarChart3, GitCompareArrows, Settings, HelpCircle, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
@@ -8,7 +8,7 @@ import type { ReactNode } from "react";
 const primaryNav = [
   { label: "Overview", to: "/dashboard", icon: LayoutDashboard },
   { label: "Analysis", to: "/results", icon: BarChart3 },
-  { label: "Market Data", to: "/compare", icon: LineChart },
+  { label: "Compare", to: "/compare", icon: GitCompareArrows },
   { label: "Settings", to: "/settings", icon: Settings },
 ];
 

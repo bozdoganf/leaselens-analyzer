@@ -54,6 +54,13 @@ export interface AnalysisResult {
   };
 }
 
+export interface SavedLeaseAnalysis {
+  id: string;
+  name: string;
+  createdAt: string;
+  result: AnalysisResult;
+}
+
 export interface CompareOption {
   id: string;
   name: string;
@@ -63,6 +70,5 @@ export interface CompareOption {
   mainRisk: string;
   recommendation: string;
 }
-
 
 

@@ -7,7 +7,8 @@ import { RiskFlagCard } from "@/components/RiskFlagCard";
 import { LandlordQuestionsChecklist } from "@/components/LandlordQuestionsChecklist";
 import { Button } from "@/components/ui/button";
 import { useAnalysis } from "@/context/AnalysisContext";
-import { AlertTriangle, GitCompareArrows, Download, RotateCcw } from "lucide-react";
+import { saveAnalysis } from "@/lib/savedAnalyses";
+import { AlertTriangle, BookmarkPlus, GitCompareArrows, Download, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
 const Results = () => {
@@ -58,6 +59,21 @@ const Results = () => {
     toast.success("Summary downloaded");
   };
 
+  const handleSaveToCompare = () => {
+    const saved = saveAnalysis(result);
+
+    if (saved.alreadySaved) {
+      toast.warning("You already saved this in compare", {
+        description: saved.analysis.name,
+      });
+      return;
+    }
+
+    toast.success("Saved to comparison", {
+      description: saved.analysis.name,
+    });
+  };
+
   return (
     <AppLayout>
       <div className="mb-8">
@@ -105,11 +121,19 @@ const Results = () => {
 
         <section className="flex flex-col sm:flex-row gap-3 pt-2">
           <Button
-            onClick={() => navigate("/compare")}
+            onClick={handleSaveToCompare}
             className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg h-11 px-5 shadow-soft"
           >
+            <BookmarkPlus className="h-4 w-4 mr-2" />
+            Save to Compare
+          </Button>
+          <Button
+            onClick={() => navigate("/compare")}
+            variant="outline"
+            className="font-semibold rounded-lg h-11 px-5 border-border bg-card hover:bg-secondary text-foreground"
+          >
             <GitCompareArrows className="h-4 w-4 mr-2" />
-            Compare Another Option
+            Open Compare
           </Button>
           <Button
             onClick={handleDownload}

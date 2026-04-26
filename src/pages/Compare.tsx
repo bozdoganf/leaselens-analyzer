@@ -1,23 +1,111 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
-import { CompareTable } from "@/components/CompareTable";
 import { Button } from "@/components/ui/button";
-import { COMPARE_OPTIONS } from "@/lib/mockAnalysis";
-import { Plus, MapPin, AlertTriangle, DollarSign, Car } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useAnalysis } from "@/context/AnalysisContext";
+import { deleteSavedAnalysis, getSavedAnalyses } from "@/lib/savedAnalyses";
+import type { SavedLeaseAnalysis } from "@/lib/types";
+import {
+  AlertTriangle,
+  Eye,
+  GitCompareArrows,
+  Plus,
+  ShieldCheck,
+  Trash2,
+  Wallet,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function scoreTone(score: number) {
+  if (score >= 80) return "text-safe";
+  if (score >= 60) return "text-caution";
+  return "text-danger";
+}
+
+function cardTone(score: number) {
+  if (score >= 80) return "border-safe/30 bg-safe-soft/30";
+  if (score >= 60) return "border-caution/30 bg-caution-soft/30";
+  return "border-danger/30 bg-danger-soft/30";
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat(undefined, {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function formatRent(analysis: SavedLeaseAnalysis) {
+  const rent = analysis.result.extracted.monthlyRent;
+
+  if (rent) {
+    return `$${rent.toLocaleString()}`;
+  }
+
+  return analysis.result.priceInsight.rent || "Unknown";
+}
+
+function getTopRisk(analysis: SavedLeaseAnalysis) {
+  return (
+    analysis.result.riskFlags.find((flag) => flag.severity === "high") ??
+    analysis.result.riskFlags[0]
+  );
+}
 
 const Compare = () => {
   const navigate = useNavigate();
-  const best = [...COMPARE_OPTIONS].sort((a, b) => b.score - a.score)[0];
-  const scoreTone = best.score >= 80 ? "safe" : best.score >= 60 ? "caution" : "danger";
+  const { setResult } = useAnalysis();
+  const [savedAnalyses, setSavedAnalyses] = useState<SavedLeaseAnalysis[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const saved = getSavedAnalyses();
+    setSavedAnalyses(saved);
+    setSelectedIds(saved.slice(0, 3).map((analysis) => analysis.id));
+  }, []);
+
+  const selectedAnalyses = useMemo(
+    () => savedAnalyses.filter((analysis) => selectedIds.includes(analysis.id)),
+    [savedAnalyses, selectedIds],
+  );
+
+  const bestAnalysis = useMemo(() => {
+    return [...savedAnalyses].sort(
+      (a, b) => b.result.overallScore - a.result.overallScore,
+    )[0];
+  }, [savedAnalyses]);
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds((current) =>
+      current.includes(id)
+        ? current.filter((selectedId) => selectedId !== id)
+        : [...current, id],
+    );
+  };
+
+  const handleViewReport = (analysis: SavedLeaseAnalysis) => {
+    setResult(analysis.result);
+    navigate("/results");
+  };
+
+  const handleDelete = (id: string) => {
+    const updated = deleteSavedAnalysis(id);
+    setSavedAnalyses(updated);
+    setSelectedIds((current) => current.filter((selectedId) => selectedId !== id));
+  };
 
   return (
     <AppLayout>
       <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-3xl font-extrabold text-foreground">Compare Options</h1>
+          <h1 className="font-display text-3xl font-extrabold text-foreground">
+            Compare Saved Leases
+          </h1>
           <p className="text-muted-foreground mt-1">
-            Evaluate your top lease choices to find the best fit for your student lifestyle.
+            Review saved reports side by side before choosing a lease.
           </p>
         </div>
         <Button
@@ -29,78 +117,275 @@ const Compare = () => {
         </Button>
       </div>
 
-      {/* Best Match Hero */}
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-card p-6 md:p-7 mb-8">
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-safe" />
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 items-start pl-3">
-          <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-safe-soft text-safe px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider mb-3">
-              ★ Best Match
-            </span>
-            <h2 className="font-display text-2xl md:text-3xl font-extrabold text-foreground">
-              {best.name}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1.5 flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5" />
-              123 College Ave.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6">
-              <div className="rounded-xl bg-primary-soft/60 p-4">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <DollarSign className="h-4 w-4 text-primary" />
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Monthly Rent
-                  </span>
-                </div>
-                <p className="font-display text-xl font-extrabold text-foreground">{best.rent}</p>
-              </div>
-              <div className="rounded-xl bg-primary-soft/60 p-4">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <Car className="h-4 w-4 text-primary" />
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Commute
-                  </span>
-                </div>
-                <p className="font-display text-xl font-extrabold text-foreground">{best.commute}</p>
-              </div>
-              <div className="rounded-xl bg-caution-soft p-4 border border-caution/20">
-                <div className="flex items-center gap-2 mb-1.5">
-                  <AlertTriangle className="h-4 w-4 text-caution" />
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-caution">
-                    Main Risk
-                  </span>
-                </div>
-                <p className="font-display text-base font-extrabold text-foreground">{best.mainRisk}</p>
-              </div>
-            </div>
+      {savedAnalyses.length === 0 ? (
+        <div className="rounded-2xl border border-border bg-card p-8 shadow-card text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary-soft text-primary">
+            <GitCompareArrows className="h-6 w-6" />
           </div>
-
-          {/* Lease Health gauge */}
-          <div className="flex flex-col items-center justify-center md:pr-2 mx-auto md:mx-0">
-            <div
+          <h2 className="font-display text-xl font-extrabold text-foreground">
+            No saved leases yet
+          </h2>
+          <p className="text-sm text-muted-foreground mt-2 mb-5">
+            Analyze a lease, save the report, then compare it here.
+          </p>
+          <Button
+            onClick={() => navigate("/upload")}
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg h-11 px-5 shadow-soft"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Analyze lease
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {bestAnalysis && (
+            <section
               className={cn(
-                "relative h-24 w-24 rounded-full border-4 flex items-center justify-center",
-                scoreTone === "safe" && "border-safe text-safe",
-                scoreTone === "caution" && "border-caution text-caution",
-                scoreTone === "danger" && "border-danger text-danger",
+                "rounded-2xl border bg-card p-6 shadow-card",
+                cardTone(bestAnalysis.result.overallScore),
               )}
             >
-              <span className="font-display text-3xl font-extrabold tabular-nums">{best.score}</span>
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <span className="inline-flex rounded-full bg-safe-soft text-safe px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider mb-2">
+                    Highest Score
+                  </span>
+                  <h2 className="font-display text-2xl font-extrabold text-foreground">
+                    {bestAnalysis.name}
+                  </h2>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Saved {formatDate(bestAnalysis.createdAt)}
+                  </p>
+                </div>
+                <div className="text-left md:text-right">
+                  <p
+                    className={cn(
+                      "font-display text-4xl font-extrabold tabular-nums",
+                      scoreTone(bestAnalysis.result.overallScore),
+                    )}
+                  >
+                    {bestAnalysis.result.overallScore}
+                    <span className="text-base text-muted-foreground"> / 100</span>
+                  </p>
+                  <p className="text-sm font-semibold text-muted-foreground">
+                    {bestAnalysis.result.riskLabel}
+                  </p>
+                </div>
+              </div>
+            </section>
+          )}
+
+          <section>
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="font-display text-xl font-extrabold text-foreground">
+                Saved Reports
+              </h2>
+              <span className="text-sm text-muted-foreground">
+                {savedAnalyses.length} saved
+              </span>
             </div>
-            <p className="text-xs font-semibold text-muted-foreground mt-2">Lease Health</p>
-          </div>
+
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-secondary/60 text-left">
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Compare
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Lease
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Score
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Rent
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Affordability
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Top Risk
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {savedAnalyses.map((analysis) => {
+                      const topRisk = getTopRisk(analysis);
+
+                      return (
+                        <tr
+                          key={analysis.id}
+                          className="border-t border-border transition-base hover:bg-primary-soft/30"
+                        >
+                          <td className="px-5 py-4">
+                            <Checkbox
+                              checked={selectedIds.includes(analysis.id)}
+                              onCheckedChange={() => toggleSelected(analysis.id)}
+                              aria-label={`Compare ${analysis.name}`}
+                            />
+                          </td>
+                          <td className="px-5 py-4">
+                            <p className="font-display font-bold text-foreground">
+                              {analysis.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {formatDate(analysis.createdAt)}
+                            </p>
+                          </td>
+                          <td className="px-5 py-4">
+                            <span
+                              className={cn(
+                                "font-display text-xl font-extrabold tabular-nums",
+                                scoreTone(analysis.result.overallScore),
+                              )}
+                            >
+                              {analysis.result.overallScore}
+                            </span>
+                            <span className="text-xs font-semibold text-muted-foreground">
+                              /100
+                            </span>
+                          </td>
+                          <td className="px-5 py-4 font-semibold text-foreground tabular-nums">
+                            {formatRent(analysis)}
+                          </td>
+                          <td className="px-5 py-4 font-semibold text-foreground tabular-nums">
+                            {analysis.result.breakdown.affordability}/100
+                          </td>
+                          <td className="px-5 py-4 text-muted-foreground">
+                            {topRisk ? topRisk.title : "No major risk"}
+                          </td>
+                          <td className="px-5 py-4">
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                onClick={() => handleViewReport(analysis)}
+                                size="sm"
+                                variant="outline"
+                                className="h-9 border-border bg-card text-foreground hover:bg-secondary"
+                              >
+                                <Eye className="h-3.5 w-3.5 mr-1.5" />
+                                View
+                              </Button>
+                              <Button
+                                onClick={() => handleDelete(analysis.id)}
+                                size="sm"
+                                variant="ghost"
+                                className="h-9 text-muted-foreground hover:text-danger hover:bg-danger-soft"
+                              >
+                                <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+                                Remove
+                              </Button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </section>
+
+          <section>
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="font-display text-xl font-extrabold text-foreground">
+                Side-by-Side
+              </h2>
+              <span className="text-sm text-muted-foreground">
+                {selectedAnalyses.length} selected
+              </span>
+            </div>
+
+            {selectedAnalyses.length === 0 ? (
+              <div className="rounded-2xl border border-border bg-card p-6 shadow-card text-sm text-muted-foreground">
+                Select saved reports above to compare them side by side.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {selectedAnalyses.map((analysis) => {
+                  const topRisk = getTopRisk(analysis);
+
+                  return (
+                    <div
+                      key={analysis.id}
+                      className="rounded-2xl border border-border bg-card p-5 shadow-card"
+                    >
+                      <div className="flex items-start justify-between gap-3 mb-5">
+                        <div>
+                          <h3 className="font-display text-lg font-extrabold text-foreground">
+                            {analysis.name}
+                          </h3>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {formatDate(analysis.createdAt)}
+                          </p>
+                        </div>
+                        <p
+                          className={cn(
+                            "font-display text-2xl font-extrabold tabular-nums",
+                            scoreTone(analysis.result.overallScore),
+                          )}
+                        >
+                          {analysis.result.overallScore}
+                        </p>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-3 py-2">
+                          <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                            <Wallet className="h-4 w-4" />
+                            Rent
+                          </span>
+                          <span className="font-bold text-foreground">{formatRent(analysis)}</span>
+                        </div>
+                        <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-3 py-2">
+                          <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                            <ShieldCheck className="h-4 w-4" />
+                            Lease Safety
+                          </span>
+                          <span className="font-bold text-foreground">
+                            {analysis.result.breakdown.leaseSafety}/100
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between rounded-xl bg-secondary/60 px-3 py-2">
+                          <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                            <Wallet className="h-4 w-4" />
+                            Affordability
+                          </span>
+                          <span className="font-bold text-foreground">
+                            {analysis.result.breakdown.affordability}/100
+                          </span>
+                        </div>
+                        <div className="rounded-xl bg-danger-soft/50 border border-danger/20 px-3 py-2">
+                          <span className="flex items-center gap-2 text-sm font-semibold text-danger mb-1">
+                            <AlertTriangle className="h-4 w-4" />
+                            Top Risk
+                          </span>
+                          <p className="text-sm font-semibold text-foreground">
+                            {topRisk ? topRisk.title : "No major risk"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => handleViewReport(analysis)}
+                        variant="outline"
+                        className="mt-5 w-full h-10 border-border bg-card text-foreground hover:bg-secondary font-semibold"
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        View full report
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
         </div>
-      </div>
-
-      <h2 className="font-display text-xl font-extrabold text-foreground mb-4">
-        Detailed Comparison
-      </h2>
-      <CompareTable options={COMPARE_OPTIONS} />
-
-      <p className="text-xs text-center text-muted-foreground pt-6">
-        Sample comparison data shown for demo purposes.
-      </p>
+      )}
     </AppLayout>
   );
 };
