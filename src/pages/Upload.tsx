@@ -5,7 +5,7 @@ import { UploadCard } from "@/components/UploadCard";
 import { HousingDetailsForm } from "@/components/HousingDetailsForm";
 import { Button } from "@/components/ui/button";
 import { useAnalysis } from "@/context/AnalysisContext";
-import { getMockAnalysis, SAMPLE_LEASE_TEXT } from "@/lib/mockAnalysis";
+import { SAMPLE_LEASE_TEXT } from "@/lib/mockAnalysis";
 import type { HousingDetails } from "@/lib/types";
 import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
@@ -38,21 +38,45 @@ const Upload = () => {
     toast.success("Sample lease loaded");
   };
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!leaseText.trim()) {
       toast.error("Add lease text first", {
         description: "Paste a lease or click 'Try Sample Lease' to continue.",
       });
       return;
     }
-    // Persist details, navigate to loading screen which will produce results.
+
     setDetails(details);
+    setResult(null);
     navigate("/analyzing", { state: { leaseText, details } });
-    setTimeout(() => {
-      const result = getMockAnalysis(leaseText, details);
+
+    try {
+      const response = await fetch("/api/analyze-lease", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          leaseText,
+          details,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Analysis request failed");
+      }
+
+      const result = await response.json();
       setResult(result);
-    }, 0);
+    } catch (error) {
+      console.error(error);
+      toast.error("Analysis failed", {
+        description: "The lease could not be analyzed. Try again.",
+      });
+      navigate("/upload");
+    }
   };
+
 
   return (
     <MarketingLayout>

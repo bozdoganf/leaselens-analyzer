@@ -45,6 +45,10 @@ export interface AnalysisResult {
     transportNote: string;
   };
   questions: string[];
+  emailTemplate: { // new emailTemplate class
+    subject: string;
+    body: string;
+  };
 }
 
 export interface CompareOption {
@@ -56,3 +60,6 @@ export interface CompareOption {
   mainRisk: string;
   recommendation: string;
 }
+
+
+
