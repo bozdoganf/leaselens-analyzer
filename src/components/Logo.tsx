@@ -4,15 +4,19 @@ import { ScanLine } from "lucide-react";
 interface LogoProps {
   subtitle?: string;
   to?: string;
+  size?: "default" | "large";
 }
 
-export const Logo = ({ subtitle, to = "/" }: LogoProps) => (
-  <Link to={to} className="flex items-center gap-2.5 group">
-    <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary-soft text-primary border border-primary/15 transition-base group-hover:scale-[1.03]">
-      <ScanLine className="h-5 w-5" />
+export const Logo = ({ subtitle, to = "/", size = "default" }: LogoProps) => {
+  const isLarge = size === "large";
+
+  return (
+  <Link to={to} className={`flex items-center group ${isLarge ? "gap-3" : "gap-2.5"}`}>
+    <div className={`flex items-center justify-center rounded-lg bg-primary-soft text-primary border border-primary/15 transition-base group-hover:scale-[1.03] ${isLarge ? "h-12 w-12" : "h-9 w-9"}`}>
+      <ScanLine className={isLarge ? "h-6 w-6" : "h-5 w-5"} />
     </div>
     <div className="leading-tight">
-      <div className="font-display text-lg font-extrabold tracking-tight text-foreground">
+      <div className={`font-display font-extrabold tracking-tight text-foreground ${isLarge ? "text-2xl" : "text-lg"}`}>
         LeaseLens
       </div>
       {subtitle && (
@@ -20,4 +24,5 @@ export const Logo = ({ subtitle, to = "/" }: LogoProps) => (
       )}
     </div>
   </Link>
-);
+  );
+};
