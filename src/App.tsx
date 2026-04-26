@@ -10,7 +10,6 @@ import Analyzing from "./pages/Analyzing.tsx";
 import Results from "./pages/Results.tsx";
 import Compare from "./pages/Compare.tsx";
 import MyLeases from "./pages/MyLeases.tsx";
-import MarketInsights from "./pages/MarketInsights.tsx";
 import Help from "./pages/Help.tsx";
 import SignIn from "./pages/SignIn.tsx";
 import Settings from "./pages/Settings.tsx";
@@ -31,7 +30,6 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/my-leases" element={<MyLeases />} />
-            <Route path="/market-insights" element={<MarketInsights />} />
             <Route path="/help" element={<Help />} />
             <Route path="/sign-in" element={<SignIn />} />
 
