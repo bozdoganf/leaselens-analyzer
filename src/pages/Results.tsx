@@ -3,13 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/layouts/AppLayout";
 import { ScoreCard } from "@/components/ScoreCard";
 import { ScoreBreakdown } from "@/components/ScoreBreakdown";
+import { InsightCard } from "@/components/InsightCard";
 import { RiskFlagCard } from "@/components/RiskFlagCard";
 import { LandlordQuestionsChecklist } from "@/components/LandlordQuestionsChecklist";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAnalysis } from "@/context/AnalysisContext";
 import { saveAnalysis } from "@/lib/savedAnalyses";
-import { AlertTriangle, BookmarkPlus, GitCompareArrows, Download, NotebookPen, RotateCcw } from "lucide-react";
+import {
+  AlertTriangle,
+  BookmarkPlus,
+  Download,
+  GitCompareArrows,
+  MapPin,
+  NotebookPen,
+  RotateCcw,
+  Wallet,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const Results = () => {
@@ -28,6 +38,11 @@ const Results = () => {
 
   if (!result) return null;
 
+  const commuteHeadline = [
+    result.commuteInsight.headline,
+    result.commuteInsight.transportNote,
+  ].filter(Boolean).join(" ");
+
   const handleDownload = () => {
     const lines = [
       "LeaseLens — Housing Risk Summary",
@@ -41,6 +56,14 @@ const Results = () => {
       `  Lease Safety:   ${result.breakdown.leaseSafety}/100`,
       `  Affordability:  ${result.breakdown.affordability}/100`,
       `  Location:       ${result.breakdown.location}/100`,
+      "",
+      "Price:",
+      `  Rent:           ${result.priceInsight.rent || "Unknown"}`,
+      `  Area Average:   ${result.priceInsight.areaAverage || "Unknown"}`,
+      "",
+      "Campus Commute:",
+      `  Commute:        ${result.commuteInsight.commute || "Unknown"}`,
+      `  Note:           ${result.commuteInsight.transportNote}`,
       "",
       ...(notes.trim()
         ? ["Notes:", notes.trim(), ""]
@@ -119,6 +142,29 @@ const Results = () => {
             Score breakdown
           </h2>
           <ScoreBreakdown breakdown={result.breakdown} />
+        </section>
+
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <InsightCard
+            icon={Wallet}
+            title="Price"
+            headline={result.priceInsight.headline}
+            primaryLabel="Rent"
+            primaryValue={result.priceInsight.rent || "Unknown"}
+            secondaryLabel="Area Avg"
+            secondaryValue={result.priceInsight.areaAverage || "Unknown"}
+            accent="green"
+          />
+          <InsightCard
+            icon={MapPin}
+            title="Campus commute"
+            headline={commuteHeadline}
+            primaryLabel="Commute"
+            primaryValue={result.commuteInsight.commute || "Unknown"}
+            secondaryLabel="Location"
+            secondaryValue={`${result.breakdown.location}/100`}
+            accent="orange"
+          />
         </section>
 
         <section>

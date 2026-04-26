@@ -30,7 +30,7 @@ export const Header = () => {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-background/80 backdrop-blur-lg">
       <div className="container flex h-16 items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 group">
+        <Link to="/my-leases" className="flex items-center gap-2 group">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-primary shadow-glow transition-base group-hover:scale-105">
             <ScanSearch className="h-5 w-5 text-primary-foreground" />
           </div>

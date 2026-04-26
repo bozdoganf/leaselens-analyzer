@@ -5,6 +5,7 @@ import {
   isSupportedLeaseFile,
 } from "../services/extractText";
 import { analyzeLeaseWithGemma } from "../services/gemini";
+import { calculateLocationScoring } from "../services/locationScoring";
 
 export const analyzeLeaseRouter = Router();
 
@@ -58,6 +59,14 @@ function getMonthlyBudget(details: unknown) {
   return monthlyBudget && monthlyBudget > 0
     ? monthlyBudget
     : DEFAULT_MONTHLY_BUDGET;
+}
+
+function getUniversityId(details: unknown) {
+  if (!details || typeof details !== "object" || !("universityId" in details)) {
+    return undefined;
+  }
+
+  return (details as { universityId?: unknown }).universityId;
 }
 
 function parseDetails(details: unknown) {
@@ -181,12 +190,28 @@ analyzeLeaseRouter.post(
 
       result.extracted.monthlyRent = monthlyRent;
       result.breakdown.affordability = affordabilityScore;
+
+      const locationScoring = await calculateLocationScoring({
+        propertyAddress: result.extracted.propertyAddress,
+        universityId: getUniversityId(details),
+      });
+
+      if (locationScoring.score !== null) {
+        result.breakdown.location = locationScoring.score;
+      }
+
+      result.commuteInsight = locationScoring.commuteInsight;
       result.overallScore = calculateOverallScore(result.breakdown);
 
       console.log("Affordability scoring:", {
         monthlyRent,
         monthlyBudget,
         affordabilityScore,
+      });
+      console.log("Location scoring:", {
+        propertyAddress: result.extracted.propertyAddress,
+        universityId: getUniversityId(details),
+        locationScore: locationScoring.score,
       });
 
       res.json(result);

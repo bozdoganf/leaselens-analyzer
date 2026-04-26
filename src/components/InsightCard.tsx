@@ -42,13 +42,17 @@ export const InsightCard = ({
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
             {primaryLabel}
           </p>
-          <p className="font-display text-xl font-extrabold text-foreground">{primaryValue}</p>
+          <p className="font-display text-lg md:text-xl font-extrabold text-foreground leading-tight break-words">
+            {primaryValue}
+          </p>
         </div>
         <div className="rounded-xl bg-secondary/60 p-4">
           <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
             {secondaryLabel}
           </p>
-          <p className="font-display text-xl font-extrabold text-foreground">{secondaryValue}</p>
+          <p className="font-display text-lg md:text-xl font-extrabold text-foreground leading-tight break-words">
+            {secondaryValue}
+          </p>
         </div>
       </div>
     </div>

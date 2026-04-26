@@ -7,7 +7,7 @@ interface LogoProps {
   size?: "default" | "large";
 }
 
-export const Logo = ({ subtitle, to = "/", size = "default" }: LogoProps) => {
+export const Logo = ({ subtitle, to = "/my-leases", size = "default" }: LogoProps) => {
   const isLarge = size === "large";
 
   return (

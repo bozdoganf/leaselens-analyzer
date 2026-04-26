@@ -58,14 +58,13 @@ export const CAMPUSES: Campus[] = [
   },
 ];
 
-export function getCampusById(id: unknown) {
+export function getCampusById(id: unknown): Campus {
+  const defaultCampus =
+    CAMPUSES.find((campus) => campus.id === DEFAULT_UNIVERSITY_ID) ?? CAMPUSES[0]!;
+
   if (typeof id !== "string") {
-    return CAMPUSES.find((campus) => campus.id === DEFAULT_UNIVERSITY_ID) ?? CAMPUSES[0];
+    return defaultCampus;
   }
 
-  return (
-    CAMPUSES.find((campus) => campus.id === id) ??
-    CAMPUSES.find((campus) => campus.id === DEFAULT_UNIVERSITY_ID) ??
-    CAMPUSES[0]
-  );
+  return CAMPUSES.find((campus) => campus.id === id) ?? defaultCampus;
 }

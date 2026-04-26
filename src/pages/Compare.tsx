@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   Eye,
   GitCompareArrows,
+  MapPin,
   NotebookPen,
   Plus,
   ShieldCheck,
@@ -47,6 +48,10 @@ function formatRent(analysis: SavedLeaseAnalysis) {
   }
 
   return analysis.result.priceInsight.rent || "Unknown";
+}
+
+function formatCommute(analysis: SavedLeaseAnalysis) {
+  return analysis.result.commuteInsight.commute || `${analysis.result.breakdown.location}/100`;
 }
 
 function getTopRisk(analysis: SavedLeaseAnalysis) {
@@ -219,6 +224,9 @@ const Compare = () => {
                         Affordability
                       </th>
                       <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
+                        Location
+                      </th>
+                      <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
                         Top Risk
                       </th>
                       <th className="px-5 py-4 font-semibold text-muted-foreground uppercase text-xs tracking-wider">
@@ -271,6 +279,14 @@ const Compare = () => {
                           </td>
                           <td className="px-5 py-4 font-semibold text-foreground tabular-nums">
                             {analysis.result.breakdown.affordability}/100
+                          </td>
+                          <td className="px-5 py-4 text-muted-foreground">
+                            <span className="font-semibold text-foreground">
+                              {analysis.result.breakdown.location}/100
+                            </span>
+                            <span className="block text-xs">
+                              {formatCommute(analysis)}
+                            </span>
                           </td>
                           <td className="px-5 py-4 text-muted-foreground">
                             {topRisk ? topRisk.title : "No major risk"}
@@ -376,6 +392,18 @@ const Compare = () => {
                           </span>
                           <span className="font-bold text-foreground">
                             {analysis.result.breakdown.affordability}/100
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between gap-3 rounded-xl bg-secondary/60 px-3 py-2">
+                          <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                            <MapPin className="h-4 w-4" />
+                            Location
+                          </span>
+                          <span className="text-right font-bold text-foreground">
+                            {analysis.result.breakdown.location}/100
+                            <span className="block text-xs font-semibold text-muted-foreground">
+                              {formatCommute(analysis)}
+                            </span>
                           </span>
                         </div>
                         <div className="rounded-xl bg-danger-soft/50 border border-danger/20 px-3 py-2">
