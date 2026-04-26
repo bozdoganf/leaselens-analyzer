@@ -1,9 +1,35 @@
 import { Router } from "express";
+import multer from "multer";
+import {
+  extractTextFromLeaseFile,
+  isSupportedLeaseFile,
+} from "../services/extractText";
 import { analyzeLeaseWithGemma } from "../services/gemini";
 
 export const analyzeLeaseRouter = Router();
 
 const DEFAULT_MONTHLY_BUDGET = 2000;
+const MAX_LEASE_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: MAX_LEASE_FILE_SIZE_BYTES,
+    files: 1,
+  },
+  fileFilter: (_req, file, cb) => {
+    if (!isSupportedLeaseFile(file)) {
+      cb(
+        new Error(
+          "Unsupported file type. Upload a PDF, screenshot, DOCX, or text file.",
+        ),
+      );
+      return;
+    }
+
+    cb(null, true);
+  },
+});
 
 function parseMoneyValue(value: unknown) {
   if (typeof value === "number") {
@@ -32,6 +58,22 @@ function getMonthlyBudget(details: unknown) {
   return monthlyBudget && monthlyBudget > 0
     ? monthlyBudget
     : DEFAULT_MONTHLY_BUDGET;
+}
+
+function parseDetails(details: unknown) {
+  if (typeof details !== "string") {
+    return details;
+  }
+
+  try {
+    return JSON.parse(details);
+  } catch {
+    return {};
+  }
+}
+
+function getBodyLeaseText(leaseText: unknown) {
+  return typeof leaseText === "string" ? leaseText.trim() : "";
 }
 
 function extractMonthlyRentFromText(leaseText: string) {
@@ -89,47 +131,80 @@ function calculateOverallScore(breakdown: {
   );
 }
 
-analyzeLeaseRouter.post("/", async (req, res) => {
-  try {
-    const { leaseText, details } = req.body;
+analyzeLeaseRouter.post(
+  "/",
+  (req, res, next) => {
+    upload.single("leaseFile")(req, res, (error) => {
+      if (!error) {
+        next();
+        return;
+      }
 
-    if (!leaseText || typeof leaseText !== "string") {
-      return res.status(400).json({
-        error: "leaseText is required",
+      const message =
+        error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE"
+          ? "Lease file must be 10MB or smaller."
+          : error.message;
+
+      res.status(400).json({ error: message });
+    });
+  },
+  async (req, res) => {
+    try {
+      const details = parseDetails(req.body.details);
+      const pastedLeaseText = getBodyLeaseText(req.body.leaseText);
+      const uploadedLeaseText = !pastedLeaseText && req.file
+        ? await extractTextFromLeaseFile(req.file)
+        : "";
+      const leaseText = pastedLeaseText || uploadedLeaseText;
+
+      if (!leaseText) {
+        return res.status(400).json({
+          error:
+            "Could not find readable lease text. Try a clearer screenshot, a PDF with selectable text, or paste the lease text.",
+        });
+      }
+
+      console.log("Analyzing lease text length:", leaseText.length);
+
+      const result = await analyzeLeaseWithGemma({
+        leaseText,
+        details,
+      });
+
+      const monthlyBudget = getMonthlyBudget(details);
+      const monthlyRent =
+        result.extracted.monthlyRent ?? extractMonthlyRentFromText(leaseText);
+      const affordabilityScore = calculateAffordabilityScore(
+        monthlyRent,
+        monthlyBudget,
+      );
+
+      result.extracted.monthlyRent = monthlyRent;
+      result.breakdown.affordability = affordabilityScore;
+      result.overallScore = calculateOverallScore(result.breakdown);
+
+      console.log("Affordability scoring:", {
+        monthlyRent,
+        monthlyBudget,
+        affordabilityScore,
+      });
+
+      res.json(result);
+    } catch (error) {
+      console.error("Lease analysis failed:", error);
+
+      if (
+        error instanceof Error &&
+        error.message.startsWith("Could not read text from this file")
+      ) {
+        return res.status(400).json({
+          error: error.message,
+        });
+      }
+
+      res.status(500).json({
+        error: "Failed to analyze lease",
       });
     }
-
-    console.log("Analyzing lease text length:", leaseText.length);
-
-    const result = await analyzeLeaseWithGemma({
-      leaseText,
-      details,
-    });
-
-    const monthlyBudget = getMonthlyBudget(details);
-    const monthlyRent =
-      result.extracted.monthlyRent ?? extractMonthlyRentFromText(leaseText);
-    const affordabilityScore = calculateAffordabilityScore(
-      monthlyRent,
-      monthlyBudget,
-    );
-
-    result.extracted.monthlyRent = monthlyRent;
-    result.breakdown.affordability = affordabilityScore;
-    result.overallScore = calculateOverallScore(result.breakdown);
-
-    console.log("Affordability scoring:", {
-      monthlyRent,
-      monthlyBudget,
-      affordabilityScore,
-    });
-
-    res.json(result);
-  } catch (error) {
-    console.error("Lease analysis failed:", error);
-
-    res.status(500).json({
-      error: "Failed to analyze lease",
-    });
-  }
-});
+  },
+);

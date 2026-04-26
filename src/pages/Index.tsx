@@ -1,12 +1,12 @@
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { MarketingLayout } from "@/layouts/MarketingLayout";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
   ShieldCheck,
   FileCheck2,
-  GaugeCircle,
-  ListChecks,
+  ClipboardCheck,
+  GitCompareArrows,
   Sparkles,
 } from "lucide-react";
 
@@ -70,17 +70,17 @@ const Index = () => {
             {
               icon: FileCheck2,
               title: "1. Upload or paste",
-              text: "Drop a lease PDF, screenshot, or paste the listing text.",
+              text: "Drop in lease text or paste your agreement to start the scan.",
             },
             {
-              icon: GaugeCircle,
-              title: "2. Add housing details",
-              text: "Rent, neighborhood, commute, utilities — the basics.",
+              icon: ClipboardCheck,
+              title: "2. Review the analysis",
+              text: "Review the score, risky clauses, affordability, and questions to ask.",
             },
             {
-              icon: ListChecks,
-              title: "3. Get a clear score",
-              text: "Risk score, flagged clauses, and questions to ask.",
+              icon: GitCompareArrows,
+              title: "3. Compare your options",
+              text: "Save reports and compare every option side by side by score, rent, risk, and notes.",
             },
           ].map((s, i) => (
             <div

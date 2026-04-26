@@ -6,20 +6,30 @@ import { cn } from "@/lib/utils";
 interface UploadCardProps {
   leaseText: string;
   onLeaseTextChange: (text: string) => void;
+  leaseFile: File | null;
+  onLeaseFileChange: (file: File | null) => void;
 }
 
-export const UploadCard = ({ leaseText, onLeaseTextChange }: UploadCardProps) => {
+export const UploadCard = ({
+  leaseText,
+  onLeaseTextChange,
+  leaseFile,
+  onLeaseFileChange,
+}: UploadCardProps) => {
   const [dragActive, setDragActive] = useState(false);
-  const [fileName, setFileName] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFile = (file: File) => {
-    setFileName(file.name);
+    onLeaseFileChange(file);
+
     if (file.type.startsWith("text/")) {
       const reader = new FileReader();
       reader.onload = (e) => onLeaseTextChange(String(e.target?.result ?? ""));
       reader.readAsText(file);
+      return;
     }
+
+    onLeaseTextChange("");
   };
 
   return (
@@ -62,8 +72,8 @@ export const UploadCard = ({ leaseText, onLeaseTextChange }: UploadCardProps) =>
             <span className="text-primary font-semibold">Choose File</span>{" "}
             <span className="text-muted-foreground">or drag and drop</span>
           </p>
-          {fileName && (
-            <p className="text-xs text-primary font-semibold">{fileName}</p>
+          {leaseFile && (
+            <p className="text-xs text-primary font-semibold">{leaseFile.name}</p>
           )}
         </div>
       </div>
@@ -79,7 +89,10 @@ export const UploadCard = ({ leaseText, onLeaseTextChange }: UploadCardProps) =>
       <Textarea
         id="lease-text"
         value={leaseText}
-        onChange={(e) => onLeaseTextChange(e.target.value)}
+        onChange={(e) => {
+          onLeaseFileChange(null);
+          onLeaseTextChange(e.target.value);
+        }}
         placeholder="Paste the full text of your lease agreement here..."
         className="min-h-[180px] resize-y text-sm leading-relaxed bg-card border-border focus-visible:ring-1 focus-visible:ring-primary"
       />

@@ -18,11 +18,12 @@ const Upload = () => {
   const navigate = useNavigate();
   const { setResult, setDetails, setNotes } = useAnalysis();
   const [leaseText, setLeaseText] = useState("");
+  const [leaseFile, setLeaseFile] = useState<File | null>(null);
 
   const handleAnalyze = async () => {
-    if (!leaseText.trim()) {
-      toast.error("Add lease text first", {
-        description: "Paste lease text or upload a text file to continue.",
+    if (!leaseText.trim() && !leaseFile) {
+      toast.error("Add a lease first", {
+        description: "Paste lease text or upload a PDF, screenshot, or text file.",
       });
       return;
     }
@@ -35,23 +36,38 @@ const Upload = () => {
     setResult(null);
     setNotes("");
     navigate("/analyzing", {
-      state: { leaseText, details: detailsForAnalysis },
+      state: { leaseText, details: detailsForAnalysis, fileName: leaseFile?.name },
     });
 
     try {
+      const formData = new FormData();
+
+      if (leaseText.trim()) {
+        formData.append("leaseText", leaseText);
+      }
+
+      if (leaseFile) {
+        formData.append("leaseFile", leaseFile);
+      }
+
+      formData.append("details", JSON.stringify(detailsForAnalysis));
+
       const response = await fetch("/api/analyze-lease", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          leaseText,
-          details: detailsForAnalysis,
-        }),
+        body: formData,
       });
 
       if (!response.ok) {
-        throw new Error("Analysis request failed");
+        let message = "The lease could not be analyzed. Try again.";
+
+        try {
+          const data = await response.json();
+          message = data.error || message;
+        } catch {
+          // Keep the default message if the server did not return JSON.
+        }
+
+        throw new Error(message);
       }
 
       const result = await response.json();
@@ -59,7 +75,10 @@ const Upload = () => {
     } catch (error) {
       console.error(error);
       toast.error("Analysis failed", {
-        description: "The lease could not be analyzed. Try again.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "The lease could not be analyzed. Try again.",
       });
       navigate("/upload");
     }
@@ -101,6 +120,8 @@ const Upload = () => {
             <UploadCard
               leaseText={leaseText}
               onLeaseTextChange={setLeaseText}
+              leaseFile={leaseFile}
+              onLeaseFileChange={setLeaseFile}
             />
             <Button
               onClick={handleAnalyze}
