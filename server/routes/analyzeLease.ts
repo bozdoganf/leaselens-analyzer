@@ -4,6 +4,10 @@ import {
   extractTextFromLeaseFile,
   isSupportedLeaseFile,
 } from "../services/extractText";
+import {
+  extractPropertyAddressFromText,
+  normalizePropertyAddress,
+} from "../services/addressExtraction";
 import { analyzeLeaseWithGemma } from "../services/gemini";
 import { calculateLocationScoring } from "../services/locationScoring";
 
@@ -189,6 +193,9 @@ analyzeLeaseRouter.post(
       );
 
       result.extracted.monthlyRent = monthlyRent;
+      result.extracted.propertyAddress =
+        normalizePropertyAddress(result.extracted.propertyAddress) ??
+        extractPropertyAddressFromText(leaseText);
       result.breakdown.affordability = affordabilityScore;
 
       const locationScoring = await calculateLocationScoring({
