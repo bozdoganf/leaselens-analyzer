@@ -1,3 +1,3 @@
 # Welcome to your Lovable project
 
-TODO: Document your project here
+TODO: Ok, make this production grade, add a documentation and ship
